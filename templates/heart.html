@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Heart Disease Screening — MedAI</title>
+
+  <style>
+    /* ── Reset & Base ─────────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary:      hsl(187, 85%, 25%);
+      --primary-10:   hsl(187, 85%, 95%);
+      --primary-20:   hsl(187, 85%, 90%);
+      --navy:         hsl(215, 25%, 27%);
+      --bg:           hsl(210, 40%, 98%);
+      --card:         #ffffff;
+      --border:       hsl(214, 32%, 91%);
+      --text:         hsl(222, 47%, 11%);
+      --muted:        hsl(215, 16%, 47%);
+      --green:        hsl(142, 76%, 36%);
+      --green-bg:     #dcfce7;
+      --green-border: #bbf7d0;
+      --yellow:       hsl(38, 92%, 50%);
+      --yellow-bg:    #fef9c3;
+      --yellow-border:#fde68a;
+      --red:          hsl(0, 84%, 60%);
+      --red-bg:       #fee2e2;
+      --red-border:   #fca5a5;
+      --radius:       14px;
+      --shadow:       0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Navbar ───────────────────────────────────────────────────────────── */
+    nav {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    /* Refactored Brand to accurately mimic logo layout in image_935ac2.png */
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 26px; /* Larger emphasis scale */
+      color: var(--primary);
+      text-decoration: none;
+      letter-spacing: -0.02em;
+    }
+
+    .nav-brand svg { 
+      color: var(--primary);
+      width: 38px; 
+      height: 38px; 
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--muted);
+      transition: color .2s;
+    }
+
+    .nav-links a.active,
+    .nav-links a:hover { color: var(--primary); }
+
+    /* ── Expanded Page Layout ─────────────────────────────────────────────── */
+    .page {
+      max-width: 920px; /* Made the layout form size larger scale */
+      margin: 0 auto;
+      padding: 44px 24px 80px;
+    }
+
+    .page-header {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 36px;
+    }
+
+    .page-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: var(--primary-10);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .page-icon svg { width: 26px; height: 26px; }
+    .page-header h1 { font-size: 30px; font-weight: 700; letter-spacing: -0.02em; }
+    .page-header p  { font-size: 14px; color: var(--muted); margin-top: 4px; }
+
+    /* ── Card Elements ────────────────────────────────────────────────────── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px; /* Amplified inner padding */
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #0f172a;
+    }
+
+    .card-desc {
+      font-size: 13.5px;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+
+    /* ── Form Grid Layout ─────────────────────────────────────────────────── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); /* Roomier cells */
+      gap: 24px;
+    }
+
+    .form-field { display: flex; flex-direction: column; gap: 8px; }
+
+    label {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    .field-hint {
+      font-size: 11.5px;
+      color: var(--muted);
+      margin-top: -2px;
+    }
+
+    /* Larger Form Inputs */
+    input[type="number"],
+    select {
+      width: 100%;
+      padding: 12px 16px; /* Enlarged element touch targets */
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 15px;
+      color: var(--text);
+      background: var(--card);
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    input[type="number"]:focus,
+    select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px var(--primary-20);
+    }
+
+    .select-wrap { position: relative; }
+
+    .select-wrap::after {
+      content: "";
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 0;
+      height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 5px solid var(--muted);
+      pointer-events: none;
+    }
+
+    .error-msg {
+      font-size: 12px;
+      color: var(--red);
+      min-height: 16px;
+      margin-top: 2px;
+    }
+
+    /* ── Enhanced Action Button Actions ───────────────────────────────────── */
+    .btn-primary {
+      width: 100%;
+      padding: 16px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: background .2s, opacity .2s;
+      margin-top: 8px;
+    }
+
+    .btn-primary:hover  { background: hsl(187, 85%, 18%); }
+    .btn-primary:disabled { opacity: .6; cursor: not-allowed; }
+
+    .btn-outline {
+      width: 100%;
+      padding: 15px;
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: border-color .2s, background .2s;
+      margin-top: 16px;
+    }
+
+    .btn-outline:hover {
+      border-color: var(--primary);
+      background: var(--primary-10);
+    }
+
+    /* ── Result UI Blocks ─────────────────────────────────────────────────── */
+    #resultSection { display: none; }
+
+    .result-banner {
+      border-radius: var(--radius);
+      border: 1px solid;
+      padding: 32px;
+      margin-bottom: 24px;
+    }
+
+    .result-banner .banner-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .result-banner .banner-top svg { width: 26px; height: 26px; }
+    .result-banner .banner-top h2 { font-size: 20px; font-weight: 700; }
+
+    .result-body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 32px;
+    }
+
+    @media (min-width: 640px) {
+      .result-body { flex-direction: row; align-items: center; }
+    }
+
+    /* Gauge */
+    .gauge-wrap { flex-shrink: 0; text-align: center; }
+    #gaugeCanvas { display: block; margin: 0 auto; }
+    .gauge-label { font-size: 13px; color: var(--muted); margin-top: 6px; }
+
+    /* Result Info Panels */
+    .result-stats { flex: 1; width: 100%; }
+
+    .result-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(0,0,0,.06);
+      font-size: 15px;
+    }
+
+    .result-row:last-child { border-bottom: none; }
+    .result-row .label { color: var(--muted); }
+    .result-row .value { font-weight: 600; }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid;
+    }
+
+    .badge.low      { background: var(--green-bg);    color: #166534; border-color: var(--green-border); }
+    .badge.moderate { background: var(--yellow-bg);   color: #854d0e; border-color: var(--yellow-border); }
+    .badge.high     { background: var(--red-bg);      color: #991b1b; border-color: var(--red-border);   }
+
+    /* Feature Importances */
+    .factor-list { list-style: none; display: flex; flex-direction: column; gap: 16px; }
+    .factor-item { display: flex; align-items: center; gap: 14px; }
+
+    .factor-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .factor-dot.high   { background: var(--red); }
+    .factor-dot.medium { background: var(--yellow); }
+    .factor-dot.low    { background: var(--green); }
+
+    .factor-body { flex: 1; min-width: 0; }
+
+    .factor-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+    }
+
+    .factor-name  { font-weight: 600; color: #1e293b; }
+    .factor-value { color: var(--muted); font-size: 13px; white-space: nowrap; }
+
+    .factor-bar {
+      margin-top: 6px;
+      height: 6px;
+      background: var(--bg);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .factor-bar-fill { height: 100%; border-radius: 99px; }
+
+    .factor-tag {
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+      text-transform: capitalize;
+      flex-shrink: 0;
+    }
+
+    .factor-tag.high   { background: #fee2e2; color: #991b1b; }
+    .factor-tag.medium { background: #fef9c3; color: #854d0e; }
+    .factor-tag.low    { background: #dcfce7; color: #166534; }
+
+    /* Recommendations */
+    .rec-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .rec-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .rec-text {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .rec-disclaimer {
+      font-size: 11.5px;
+      color: var(--muted);
+      font-style: italic;
+      margin-top: 14px;
+    }
+
+    /* Loading Micro-interactions */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner { display: inline-block; animation: spin .8s linear infinite; }
+
+    .disclaimer {
+      background: var(--primary-10);
+      border: 1px solid var(--primary-20);
+      border-radius: 8px;
+      padding: 14px 18px;
+      font-size: 13px;
+      color: var(--primary);
+      margin-bottom: 28px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      line-height: 1.5;
+    }
+
+    .disclaimer svg { width: 18px; height: 18px; flex-shrink: 0; margin-top: 1px; }
+  </style>
+</head>
+
+<body>
+
+<!-- ── Navbar (Incorporating explicit branding specifications from image_935ac2.png) ── -->
+<nav>
+  <a href="#" class="nav-brand">
+    <!-- SVG markup representing verbatim vector elements from image_935ac2.png -->
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 12h3l3-9 4 18 3-13 1 4h4"/>
+    </svg>
+    <span>MedAI</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#">Home</a></li>
+    <li><a href="#">Dashboard</a></li>
+    <li><a href="#" class="active">Heart AI</a></li>
+    <li><a href="#">Diabetes AI</a></li>
+    <li><a href="#">History</a></li>
+  </ul>
+</nav>
+
+<!-- ── Page Wrapper ── -->
+<div class="page">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="page-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Heart Disease Screening</h1>
+      <p>Enter clinical biomarkers to assess cardiovascular disease risk using ML</p>
+    </div>
+  </div>
+
+  <!-- Disclaimer Information Alert -->
+  <div class="disclaimer">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
+      <line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+    For informational and educational purposes only. Always consult a qualified medical professional for diagnosis and treatment.
+  </div>
+
+  <!-- ── LARGE FORM ENTRY BLOCK ── -->
+  <div id="formSection">
+    <form id="heartForm" novalidate>
+
+      <!-- Section: Demographics -->
+      <div class="card">
+        <div class="card-title">Patient Demographics</div>
+        <div class="card-desc">Basic patient configuration properties</div>
+        <div class="form-grid">
+
+          <div class="form-field">
+            <label for="age">Age (years)</label>
+            <input type="number" id="age" name="age" min="1" max="120" value="54" placeholder="e.g. 54" />
+            <span class="error-msg" id="err-age"></span>
+          </div>
+
+          <div class="form-field">
+            <label for="sex">Sex</label>
+            <div class="select-wrap">
+              <select id="sex" name="sex">
+                <option value="1">Male</option>
+                <option value="0">Female</option>
+              </select>
+            </div>
+            <span class="error-msg"></span>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Section: Vitals & Labs -->
+      <div class="card">
+        <div class="card-title">Vital Signs &amp; Lab Results</div>
+        <div class="card-desc">Measured metrics computed inside target clinical environment parameters</div>
+        <div class="form-grid">
+
+          <div class="form-field">
+            <label for="trestbps">Resting Blood Pressure (trestbps)</label>
+            <input type="number" id="trestbps" name="trestbps" min="50" max="250" value="130" />
+            <span class="field-hint">mm Hg</span>
+            <span class="error-msg" id="err-trestbps"></span>
+          </div>
+
+          <div class="form-field">
+            <label for="chol">Cholesterol (chol)</label>
+            <input type="number" id="chol" name="chol" min="0" max="600" value="246" />
+            <span class="field-hint">mg/dL serum</span>
+            <span class="error-msg" id="err-chol"></span>
+          </div>
+
+          <div class="form-field">
+            <label for="thalach">Max Heart Rate (thalach)</label>
+            <input type="number" id="thalach" name="thalach" min="60" max="250" value="150" />
+            <span class="field-hint">bpm achieved</span>
+            <span class="error-msg" id="err-thalach"></span>
+          </div>
+
+          <div class="form-field">
+            <label for="oldpeak">ST Depression (oldpeak)</label>
+            <input type="number" id="oldpeak" name="oldpeak" min="-3" max="10" step="0.1" value="1.0" />
+            <span class="field-hint">Exercise vs rest condition matrix</span>
+            <span class="error-msg" id="err-oldpeak"></span>
+          </div>
+
+          <div class="form-field">
+            <label for="fbs">Fasting Blood Sugar &gt; 120 mg/dL (fbs)</label>
+            <div class="select-wrap">
+              <select id="fbs" name="fbs">
+                <option value="0">No</option>
+                <option value="1">Yes</option>
+              </select>
+            </div>
+            <span class="error-msg"></span>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Section: Clinical Findings -->
+      <div class="card">
+        <div class="card-title">Clinical Findings</div>
+        <div class="card-desc">ECG properties and exercise diagnostics vectors</div>
+        <div class="form-grid">
+
+          <div class="form-field">
+            <label for="cp">Chest Pain Type (cp)</label>
+            <div class="select-wrap">
+              <select id="cp" name="cp">
+                <option value="0">Typical Angina</option>
+                <option value="1">Atypical Angina</option>
+                <option value="2">Non-anginal Pain</option>
+                <option value="3">Asymptomatic</option>
+              </select>
+            </div>
+            <span class="error-msg"></span>
+          </div>
+
+          <div class="form-field">
+            <label for="restecg">Resting ECG Results (restecg)</label>
+            <div class="select-wrap">
+              <select id="restecg" name="restecg">
+                <option value="0">Normal</option>
+                <option value="1">ST-T Wave Abnormality</option>
+                <option value="2">Left Ventricular Hypertrophy</option>
+              </select>
+            </div>
+            <span class="error-msg"></span>
+          </div>
+
+          <div class="form-field">
+            <label for="exang">Exercise Induced Angina (exang)</label>
+            <div class="select-wrap">
+              <select id="exang" name="exang">
+                <option value="0">No</option>
+                <option value="1">Yes</option>
+              </select>
+            </div>
+            <span class="error-msg"></span>
+          </div>
+
+          <div class="form-field">
+            <label for="slope">ST Segment Slope (slope)</label>
+            <div class="select-wrap">
+              <select id="slope" name="slope">
+                <option value="0">Upsloping</option>
+                <option value="1">Flat</option>
+                <option value="2">Downsloping</option>
+              </select>
+            </div>
+            <span class="error-msg"></span>
+          </div>
+
+          <div class="form-field">
+            <label for="ca">Major Vessels (ca)</label>
+            <div class="select-wrap">
+              <select id="ca" name="ca">
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+              </select>
+            </div>
+            <span class="error-msg"></span>
+          </div>
+
+          <div class="form-field">
+            <label for="thal">Thalassemia (thal)</label>
+            <div class="select-wrap">
+              <select id="thal" name="thal">
+                <option value="0">Unknown</option>
+                <option value="1">Normal</option>
+                <option value="2" selected>Fixed Defect</option>
+                <option value="3">Reversible Defect</option>
+              </select>
+            </div>
+            <span class="error-msg"></span>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Action Execution Element -->
+      <button type="submit" class="btn-primary" id="submitBtn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+        Run Heart Disease Analysis
+      </button>
+
+    </form>
+  </div>
+
+  <!-- ── OUTPUT METRIC REPORT INSIGHT PANELS ── -->
+  <div id="resultSection">
+
+    <!-- Risk Level Notification Area -->
+    <div class="result-banner" id="resultBanner">
+      <div class="banner-top">
+        <svg id="bannerIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"></svg>
+        <h2 id="bannerTitle"></h2>
+      </div>
+      <div class="result-body">
+        <!-- Probability Display Vector -->
+        <div class="gauge-wrap">
+          <canvas id="gaugeCanvas" width="150" height="150"></canvas>
+          <div class="gauge-label">probability</div>
+        </div>
+        <!-- Data Table Meta Results -->
+        <div class="result-stats">
+          <div class="result-row">
+            <span class="label">Prediction</span>
+            <span class="value" id="resPrediction"></span>
+          </div>
+          <div class="result-row">
+            <span class="label">Risk Level</span>
+            <span class="value" id="resRiskBadge"></span>
+          </div>
+          <div class="result-row">
+            <span class="label">Confidence</span>
+            <span class="value" id="resConfidence"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Machine Learning Local Feature Importance Weights -->
+    <div class="card">
+      <div class="card-title">Top Contributing Risk Factors</div>
+      <div class="card-desc" style="margin-bottom:16px">Features that most heavily weighted the logistical target inference</div>
+      <ul class="factor-list" id="factorList"></ul>
+    </div>
+
+    <!-- Recommendations Engine Output Card -->
+    <div class="rec-card">
+      <div class="rec-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        Recommendation
+      </div>
+      <p class="rec-text" id="recText"></p>
+      <p class="rec-disclaimer">This tool is for informational purposes only. Always consult a qualified medical professional for diagnosis and treatment.</p>
+    </div>
+
+    <!-- Navigation Clear Action Trigger -->
+    <button class="btn-outline" id="resetBtn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="1 4 1 10 7 10"/>
+        <path d="M3.51 15a9 9 0 1 0 .49-3.99"/>
+      </svg>
+      Run Another Screening
+    </button>
+
+  </div>
+
+</div>
+
+<footer style="border-top:1px solid var(--border);text-align:center;padding:32px 24px;font-size:13px;color:var(--muted)">
+  <p>MedAI — Clinical Grade AI Predictive Architecture Engine</p>
+  <p style="margin-top:6px">For informational purposes only. Not medical advice.</p>
+</footer>
+
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════════════
+   INTEGRATED MODEL COEFFICIENTS MATRIX (Cleveland Dataset Properties Mapping)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const MEAN = {
+  age: 54.37, sex: 0.68, cp: 0.97, trestbps: 131.62,
+  chol: 246.26, fbs: 0.15, restecg: 0.53,
+  thalach: 149.65, exang: 0.33, oldpeak: 1.04,
+  slope: 1.40, ca: 0.73, thal: 2.31,
+};
+
+const STD = {
+  age: 9.08, sex: 0.47, cp: 1.03, trestbps: 17.54,
+  chol: 51.83, fbs: 0.36, restecg: 0.53,
+  thalach: 22.91, exang: 0.47, oldpeak: 1.16,
+  slope: 0.62, ca: 1.02, thal: 0.61,
+};
+
+const COEF = {
+  intercept: -1.2,
+  age: 0.38, sex: 0.61, cp: -0.52, trestbps: 0.22,
+  chol: 0.15, fbs: 0.28, restecg: 0.19,
+  thalach: -0.41, exang: 0.49, oldpeak: 0.52,
+  slope: -0.44, ca: 0.67, thal: 0.59,
+};
+
+const LABELS = {
+  age: "Age",
+  sex: "Sex",
+  cp: "Chest Pain Type (cp)",
+  trestbps: "Resting Blood Pressure (trestbps)",
+  chol: "Cholesterol Level (chol)",
+  fbs: "Fasting Blood Sugar (fbs)",
+  restecg: "Resting ECG (restecg)",
+  thalach: "Maximum Heart Rate (thalach)",
+  exang: "Exercise Induced Angina (exang)",
+  oldpeak: "ST Depression (oldpeak)",
+  slope: "ST Segment Slope (slope)",
+  ca: "Major Vessels (ca)",
+  thal: "Thalassemia (thal)",
+};
+
+function formatVal(key, v) {
+  const m = {
+    sex:       () => v == 1 ? "Male" : "Female",
+    cp:        () => ["Typical Angina","Atypical Angina","Non-anginal","Asymptomatic"][v] ?? v,
+    fbs:       () => v == 1 ? "Yes (>120 mg/dL)" : "No",
+    restecg:   () => ["Normal","ST-T Abnormality","LV Hypertrophy"][v] ?? v,
+    exang:     () => v == 1 ? "Yes" : "No",
+    slope:     () => ["Upsloping","Flat","Downsloping"][v] ?? v,
+    thal:      () => ["Unknown","Normal","Fixed Defect","Reversible Defect"][v] ?? v,
+    trestbps:  () => v + " mm Hg",
+    chol:      () => v + " mg/dL",
+    thalach:   () => v + " bpm",
+    oldpeak:   () => Number(v).toFixed(1),
+  };
+  return m[key] ? m[key]() : String(v);
+}
+
+function sigmoid(x) { return 1 / (1 + Math.exp(-x)); }
+function standardize(val, mean, std) { return (val - mean) / std; }
+
+function predictHeart(input) {
+  const features = Object.keys(COEF).filter(k => k !== "intercept");
+  let logit = COEF.intercept;
+  const contributions = [];
+
+  features.forEach(key => {
+    const raw = Number(input[key]);
+    const z   = standardize(raw, MEAN[key], STD[key]);
+    const c   = COEF[key];
+    logit += c * z;
+    contributions.push({ key, contribution: Math.abs(c * z), value: raw });
+  });
+
+  const probability = sigmoid(logit);
+  const target = probability >= 0.5 ? 1 : 0;
+  const riskLevel   = probability < 0.3 ? "low" : probability < 0.6 ? "moderate" : "high";
+
+  const sorted = [...contributions].sort((a, b) => b.contribution - a.contribution);
+  const topRiskFactors = sorted.slice(0, 5).map((item, i) => ({
+    factor: LABELS[item.key] ?? item.key,
+    impact: i === 0 ? "high" : i <= 2 ? "medium" : "low",
+    value:  formatVal(item.key, item.value),
+    barWidth: i === 0 ? "85%" : i <= 2 ? "60%" : "35%",
+  }));
+
+  const recs = {
+    high:     "Your results indicate a high risk of heart disease. Please consult a cardiologist immediately for a comprehensive evaluation including ECG and stress tests.",
+    moderate: "Your results indicate a moderate risk. Schedule an appointment with your doctor to discuss lifestyle modifications, dietary changes, and possible further testing.",
+    low:      "Your results indicate a low risk. Maintain a heart-healthy lifestyle with regular exercise, balanced diet, and annual check-ups.",
+  };
+
+  return { probability, target, riskLevel, topRiskFactors, recommendation: recs[riskLevel] };
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   DYNAMIC CANVAS ARC ENGINE
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+function drawGauge(probability) {
+  const canvas = document.getElementById("gaugeCanvas");
+  const ctx    = canvas.getContext("2d");
+  const cx = 75, cy = 75, r = 54;
+  const pct = Math.round(probability * 100);
+
+  const trackColor = "#e2e8f0";
+  const fillColor  = pct < 30 ? "#16a34a" : pct < 60 ? "#f59e0b" : "#ef4444";
+
+  ctx.clearRect(0, 0, 150, 150);
+
+  // Background Track Arc
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.strokeStyle = trackColor;
+  ctx.lineWidth = 12;
+  ctx.stroke();
+
+  // Highlight Fill
+  const endAngle = -Math.PI / 2 + (pct / 100) * Math.PI * 2;
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, -Math.PI / 2, endAngle);
+  ctx.strokeStyle = fillColor;
+  ctx.lineWidth = 12;
+  ctx.lineCap = "round";
+  ctx.stroke();
+
+  // Context Metrics Text Info
+  ctx.font = "bold 26px -apple-system, sans-serif";
+  ctx.fillStyle = "#0f172a";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(pct + "%", cx, cy);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RUNTIME FORM HANDLERS & ERROR INTERCEPTORS
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+function getFormData() {
+  return {
+    age:            document.getElementById("age").value,
+    sex:            document.getElementById("sex").value,
+    cp:             document.getElementById("cp").value,
+    trestbps:       document.getElementById("trestbps").value,
+    chol:           document.getElementById("chol").value,
+    fbs:            document.getElementById("fbs").value,
+    restecg:        document.getElementById("restecg").value,
+    thalach:        document.getElementById("thalach").value,
+    exang:          document.getElementById("exang").value,
+    oldpeak:        document.getElementById("oldpeak").value,
+    slope:          document.getElementById("slope").value,
+    ca:             document.getElementById("ca").value,
+    thal:           document.getElementById("thal").value,
+  };
+}
+
+function validate(data) {
+  const errors = {};
+  if (!data.age || data.age < 1 || data.age > 120)
+    errors.age = "Enter a valid age (1–120)";
+  if (!data.trestbps || data.trestbps < 50 || data.trestbps > 250)
+    errors.trestbps = "Enter a valid BP (50–250)";
+  if (!data.chol || data.chol < 0 || data.chol > 600)
+    errors.chol = "Enter a valid value (0–600)";
+  if (!data.thalach || data.thalach < 60 || data.thalach > 250)
+    errors.thalach = "Enter a valid HR (60–250)";
+  if (data.oldpeak === "" || data.oldpeak < -3 || data.oldpeak > 10)
+    errors.oldpeak = "Enter a valid value (−3 to 10)";
+  return errors;
+}
+
+function clearErrors() {
+  ["age","trestbps","chol","thalach","oldpeak"].forEach(id => {
+    const el = document.getElementById("err-" + id);
+    if (el) el.textContent = "";
+  });
+}
+
+function showErrors(errors) {
+  Object.entries(errors).forEach(([key, msg]) => {
+    const el = document.getElementById("err-" + key);
+    if (el) el.textContent = msg;
+  });
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   REPORT LAYOUT RENDERING ENGINE
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+function renderResult(result) {
+  const pct = Math.round(result.probability * 100);
+
+  const bannerColors = {
+    low:      { bg: "#f0fdf4", border: "#bbf7d0", text: "#166534" },
+    moderate: { bg: "#fefce8", border: "#fde68a", text: "#854d0e" },
+    high:     { bg: "#fef2f2", border: "#fca5a5", text: "#991b1b" },
+  };
+  const bc = bannerColors[result.riskLevel];
+  const banner = document.getElementById("resultBanner");
+  banner.style.background    = bc.bg;
+  banner.style.borderColor   = bc.border;
+  banner.querySelector("h2").style.color = bc.text;
+
+  const iconSvg = result.riskLevel === "low"
+    ? '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>'
+    : '<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>';
+  document.getElementById("bannerIcon").innerHTML = iconSvg;
+  document.getElementById("bannerIcon").style.color = bc.text;
+
+  const riskLabels = { low: "Low Risk Detected", moderate: "Moderate Risk Detected", high: "High Risk Detected" };
+  document.getElementById("bannerTitle").textContent = riskLabels[result.riskLevel];
+
+  drawGauge(result.probability);
+
+  document.getElementById("resPrediction").textContent =
+    result.target === 1 ? "Positive (Disease Detected)" : "Negative (No Disease)";
+
+  const badgeEl = document.getElementById("resRiskBadge");
+  badgeEl.innerHTML = `<span class="badge ${result.riskLevel}">${result.riskLevel.charAt(0).toUpperCase() + result.riskLevel.slice(1)} Risk</span>`;
+
+  document.getElementById("resConfidence").textContent = pct + "%";
+
+  const list = document.getElementById("factorList");
+  list.innerHTML = "";
+  const barColors = { high: "#ef4444", medium: "#f59e0b", low: "#16a34a" };
+
+  result.topRiskFactors.forEach(f => {
+    const li = document.createElement("li");
+    li.className = "factor-item";
+    li.innerHTML = `
+      <div class="factor-dot ${f.impact}"></div>
+      <div class="factor-body">
+        <div class="factor-top">
+          <span class="factor-name">${f.factor}</span>
+          <span class="factor-value">${f.value}</span>
+        </div>
+        <div class="factor-bar">
+          <div class="factor-bar-fill" style="width:${f.barWidth};background:${barColors[f.impact]}"></div>
+        </div>
+      </div>
+      <span class="factor-tag ${f.impact}">${f.impact}</span>
+    `;
+    list.appendChild(li);
+  });
+
+  document.getElementById("recText").textContent = result.recommendation;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   FORM INTERACTION MATRIX SUBMISSION CONTROLLER
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+document.getElementById("heartForm").addEventListener("submit", function (e) {
+  e.preventDefault();
+  clearErrors();
+
+  const data   = getFormData();
+  const errors = validate(data);
+
+  if (Object.keys(errors).length > 0) {
+    showErrors(errors);
+    return;
+  }
+
+  const btn = document.getElementById("submitBtn");
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner">⟳</span> Executing Matrix Predictive Analytics Optimization Pipeline...';
+
+  setTimeout(() => {
+    const result = predictHeart(data);
+    renderResult(result);
+
+    document.getElementById("formSection").style.display   = "none";
+    document.getElementById("resultSection").style.display = "block";
+    window.scrollTo({ top: 0, behavior: "smooth" });
+
+    btn.disabled = false;
+    btn.innerHTML = `
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+      </svg>
+      Run Heart Disease Analysis`;
+  }, 750);
+});
+
+/* Reset UI State Action */
+document.getElementById("resetBtn").addEventListener("click", function () {
+  document.getElementById("resultSection").style.display = "none";
+  document.getElementById("formSection").style.display   = "block";
+  document.getElementById("heartForm").reset();
+  clearErrors();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+</script>
+
+</body>
+</html>

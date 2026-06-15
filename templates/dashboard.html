@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MedAI Dashboard — Predictive Intelligence Node</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <style>
+    /* ── Core Design Token Reset ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary:      hsl(187, 85%, 25%);
+      --primary-10:   hsl(187, 85%, 95%);
+      --navy:         hsl(215, 25%, 27%);
+      --bg:           hsl(210, 40%, 98%);
+      --card:         #ffffff;
+      --border:       hsl(214, 32%, 91%);
+      --text:         hsl(222, 47%, 11%);
+      --muted:        hsl(215, 16%, 47%);
+      --green:        #10b981;
+      --yellow:       #f59e0b;
+      --red:          #ef4444;
+      --blue:         #3b82f6;
+      --purple:       #8b5cf6;
+      --purple-10:    #f5f3ff;
+      --radius:       12px;
+      --shadow:       0 1px 4px rgba(0,0,0,.04);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Navigation ───────────────────────────────────────────────────────── */
+    nav {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      height: 65px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 1.25rem;
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .nav-brand svg { width: 24px; height: 24px; }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--muted);
+      transition: color .2s ease;
+    }
+
+    .nav-links a.active, .nav-links a:hover { color: var(--primary); }
+
+    /* ── Structural Layout ────────────────────────────────────────────────── */
+    .page { max-width: 1400px; margin: 0 auto; padding: 2.5rem 2rem; }
+
+    .page-header { margin-bottom: 2.5rem; }
+    .page-header h1 { font-size: 2rem; font-weight: 700; letter-spacing: -0.02em; }
+    .page-header p { color: var(--muted); margin-top: 4px; font-size: 0.95rem; }
+
+    /* ── Metric Stat Cards ────────────────────────────────────────────────── */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+    }
+
+    .stat-card .stat-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .stat-card .stat-label { font-size: 0.85rem; color: var(--muted); font-weight: 600; }
+
+    .stat-card .stat-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .stat-card .stat-value { font-size: 2.25rem; font-weight: 700; line-height: 1.1; }
+    .stat-card .stat-sub { font-size: 0.8rem; color: var(--muted); margin-top: 6px; }
+
+    /* ── Data Graphics Row ───────────────────────────────────────────────── */
+    .chart-row {
+      display: grid;
+      grid-template-columns: 3fr 2fr;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    @media (max-width: 1024px) { .chart-row { grid-template-columns: 1fr; } }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+    }
+
+    .card-header { margin-bottom: 1.5rem; }
+    .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title svg { width: 18px; height: 18px; color: var(--muted); }
+    .card-desc { font-size: 0.85rem; color: var(--muted); margin-top: 4px; }
+
+    .chart-wrap { position: relative; height: 280px; display: flex; flex-direction: column; justify-content: center; }
+
+    .custom-legend {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 14px;
+      list-style: none;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .legend-item { display: flex; align-items: center; gap: 6px; color: var(--muted); }
+    .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+
+    /* ── Recent Screenings Table ─────────────────────────────────────────── */
+    .table-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+    }
+
+    .btn-outline {
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      padding: 6px 16px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all .2s ease;
+    }
+    .btn-outline:hover { border-color: var(--primary); background: var(--primary-10); }
+
+    .record-list { list-style: none; }
+
+    .record-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .record-item:last-child { border-bottom: none; }
+
+    .record-left { display: flex; align-items: center; gap: 1rem; }
+
+    .record-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .record-icon.heart { background: var(--primary-10); color: var(--primary); }
+    .record-icon.diabetes { background: hsl(210,70%,93%); color: var(--blue); }
+    .record-icon.parkinson { background: var(--purple-10); color: var(--purple); }
+    .record-icon svg { width: 18px; height: 18px; }
+
+    .record-name { font-size: 0.95rem; font-weight: 600; }
+    .record-meta { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
+
+    .record-right { display: flex; align-items: center; gap: 1.5rem; }
+    .record-prob { font-size: 0.9rem; color: var(--muted); font-weight: 500; }
+
+    /* ── Risk Badges ──────────────────────────────────────────────────────── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border: 1px solid;
+      text-transform: capitalize;
+    }
+    .badge.low      { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
+    .badge.moderate { background: #fef9c3; color: #854d0e; border-color: #fde68a; }
+    .badge.high     { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
+
+    /* ── Diagnostics Selection Module ────────────────────────────────────── */
+    .action-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2.5rem;
+    }
+
+    .action-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.75rem;
+      cursor: pointer;
+      transition: all .25s ease;
+      text-decoration: none;
+      color: inherit;
+    }
+    .action-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(0,0,0,.04);
+    }
+
+    .action-card svg { width: 32px; height: 32px; margin-bottom: 1rem; }
+    .action-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 6px; }
+    .action-card p { font-size: 0.9rem; color: var(--muted); line-height: 1.6; }
+
+    .action-link {
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-top: 1.25rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      color: var(--primary);
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      text-align: center;
+      padding: 2.5rem;
+      margin-top: 5rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+
+<body>
+
+<nav>
+  <a href="#" class="nav-brand">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+    </svg>
+    MedAI
+  </a>
+  <ul class="nav-links">
+    <li><a href="#">Home</a></li>
+    <li><a href="#" class="active">Dashboard</a></li>
+    <li><a href="#">Heart AI</a></li>
+    <li><a href="#">Diabetes AI</a></li>
+    <li><a href="#">Parkinson AI</a></li>
+    <li><a href="#">History</a></li>
+  </ul>
+</nav>
+
+<div class="page">
+
+  <div class="page-header">
+    <h1>Dashboard</h1>
+    <p>Overview of all ML predictions and screening results</p>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-top">
+        <span class="stat-label">Total Screenings</span>
+        <div class="stat-icon" style="background:#f1f5f9">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+      </div>
+      <div class="stat-value" id="val-total">-</div>
+      <div class="stat-sub">All time predictions</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-top">
+        <span class="stat-label">Heart Screenings</span>
+        <div class="stat-icon" style="background:var(--primary-10)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </div>
+      </div>
+      <div class="stat-value" id="val-heart">-</div>
+      <div class="stat-sub" id="sub-heart">-% positive rate</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-top">
+        <span class="stat-label">Diabetes Screenings</span>
+        <div class="stat-icon" style="background:hsl(210,70%,93%)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+        </div>
+      </div>
+      <div class="stat-value" id="val-diabetes">-</div>
+      <div class="stat-sub" id="sub-diabetes">-% positive rate</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-top">
+        <span class="stat-label">Parkinson Screenings</span>
+        <div class="stat-icon" style="background:var(--purple-10)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2">
+            <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1 0-4.12 2.5 2.5 0 0 1 0-4.88 2.5 2.5 0 0 1 0-4.12A2.5 2.5 0 0 1 9.5 2zM14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44 2.5 2.5 0 0 0 0-4.12 2.5 2.5 0 0 0 0-4.88 2.5 2.5 0 0 0 0-4.12A2.5 2.5 0 0 0 14.5 2z"/>
+          </svg>
+        </div>
+      </div>
+      <div class="stat-value" id="val-parkinson">-</div>
+      <div class="stat-sub" id="sub-parkinson">-% positive rate</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-top">
+        <span class="stat-label">High Risk Cases</span>
+        <div class="stat-icon" style="background:#fee2e2">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+        </div>
+      </div>
+      <div class="stat-value" style="color:var(--red)" id="val-high-risk">-</div>
+      <div class="stat-sub">Require immediate attention</div>
+    </div>
+  </div>
+
+  <div class="chart-row">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          Prediction Trend (30 days)
+        </div>
+        <div class="card-desc">Daily screening volume by medical condition parameters</div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="trendChart"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Risk Distribution</div>
+        <div class="card-desc">Overall engine risk stratifications</div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="riskChart"></canvas>
+        <ul class="custom-legend">
+          <li class="legend-item"><span class="dot" style="background:var(--green)"></span>Low Risk</li>
+          <li class="legend-item"><span class="dot" style="background:var(--yellow)"></span>Moderate</li>
+          <li class="legend-item"><span class="dot" style="background:var(--red)"></span>High Risk</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="table-header">
+      <div>
+        <div class="card-title">Recent Screenings</div>
+        <div class="card-desc">Latest model inferences computed across active screening nodes</div>
+      </div>
+      <button class="btn-outline">View All &rarr;</button>
+    </div>
+    <ul class="record-list" id="recent-records-container">
+      </ul>
+  </div>
+
+  <div class="action-grid">
+    <a href="#" class="action-card">
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      <h3>Heart Disease Screening</h3>
+      <p>Analyze cardiovascular parameters and predictive anomalies using 13 verified physiological biomarkers.</p>
+      <div class="action-link">Start Screening &rarr;</div>
+    </a>
+
+    <a href="#" class="action-card">
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+      <h3>Diabetes Screening</h3>
+      <p>Assess standard metabolic metrics and identify early-onset insulin-resistance risks using 8 data points.</p>
+      <div class="action-link">Start Screening &rarr;</div>
+    </a>
+
+    <a href="#" class="action-card">
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2">
+        <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1 0-4.12 2.5 2.5 0 0 1 0-4.88 2.5 2.5 0 0 1 0-4.12A2.5 2.5 0 0 1 9.5 2zM14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44 2.5 2.5 0 0 0 0-4.12 2.5 2.5 0 0 0 0-4.88 2.5 2.5 0 0 0 0-4.12A2.5 2.5 0 0 0 14.5 2z"/>
+      </svg>
+      <h3>Parkinson Screening</h3>
+      <p>Detect early motor irregularities via rest tremors, vocal acoustic frequencies, and kinetic gait tracking matrices.</p>
+      <div class="action-link">Start Screening &rarr;</div>
+    </a>
+  </div>
+
+</div>
+
+<footer>
+  <p>MedAI — Clinical Grade AI Predictive Infrastructure Engine</p>
+</footer>
+
+<script>
+  // Global Data Injection Matrix (Overwrite directly via Backend Template Variables)
+  window.medaiDashboardData = {
+    metrics: {
+      totalScreenings: 18,
+      heartCount: 7,
+      heartPositiveRate: 43,
+      diabetesCount: 6,
+      diabetesPositiveRate: 67,
+      parkinsonCount: 5,
+      parkinsonPositiveRate: 20,
+      highRiskCases: 6
+    },
+    trendChart: {
+      labels: ['05-22', '05-27', '05-28', '06-01', '06-02', '06-03', '06-10', '06-11', '06-12'],
+      heartData: [1, 0, 1, 0, 1, 0, 0, 0, 3], 
+      diabetesData: [0, 1, 0, 1, 0, 1, 1, 2, 1],
+      parkinsonData: [1, 0, 0, 0, 1, 1, 0, 1, 1] // Added condition array
+    },
+    riskDistribution: {
+      low: 6,
+      moderate: 6,
+      high: 6
+    },
+    recentScreenings: [
+      { id: 1, type: 'parkinson', name: 'Parkinson Neurological Screening', age: 68, date: 'Jun 14, 2026', probability: 74, risk: 'high' },
+      { id: 2, type: 'heart', name: 'Heart Disease Screening', age: 54, date: 'Jun 12, 2026', probability: 18, risk: 'low' },
+      { id: 3, type: 'diabetes', name: 'Diabetes Disease Screening', age: 33, date: 'Jun 12, 2026', probability: 51, risk: 'moderate' },
+      { id: 4, type: 'heart', name: 'Heart Disease Screening', age: 63, date: 'Jun 12, 2026', probability: 82, risk: 'high' },
+      { id: 5, type: 'parkinson', name: 'Parkinson Neurological Screening', age: 47, date: 'Jun 10, 2026', probability: 12, risk: 'low' }
+    ]
+  };
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const data = window.medaiDashboardData;
+
+    // Direct Hydration Mapping
+    document.getElementById('val-total').innerText = data.metrics.totalScreenings;
+    document.getElementById('val-heart').innerText = data.metrics.heartCount;
+    document.getElementById('sub-heart').innerText = `${data.metrics.heartPositiveRate}% positive rate`;
+    document.getElementById('val-diabetes').innerText = data.metrics.diabetesCount;
+    document.getElementById('sub-diabetes').innerText = `${data.metrics.diabetesPositiveRate}% positive rate`;
+    document.getElementById('val-parkinson').innerText = data.metrics.parkinsonCount;
+    document.getElementById('sub-parkinson').innerText = `${data.metrics.parkinsonPositiveRate}% positive rate`;
+    document.getElementById('val-high-risk').innerText = data.metrics.highRiskCases;
+
+    // Render 3-Way Multivariable Trend Chart
+    const trendCtx = document.getElementById('trendChart').getContext('2d');
+    new Chart(trendCtx, {
+      type: 'bar',
+      data: {
+        labels: data.trendChart.labels,
+        datasets: [
+          { label: 'Heart AI', data: data.trendChart.heartData, backgroundColor: '#006671' },
+          { label: 'Diabetes AI', data: data.trendChart.diabetesData, backgroundColor: '#3b82f6' },
+          { label: 'Parkinson AI', data: data.trendChart.parkinsonData, backgroundColor: '#8b5cf6' }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { display: false } },
+          y: { grid: { color: '#f1f5f9' }, ticks: { stepSize: 1 }, min: 0 }
+        }
+      }
+    });
+
+    // Render Risk Distribution Donut Chart
+    const riskCtx = document.getElementById('riskChart').getContext('2d');
+    new Chart(riskCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Low Risk', 'Moderate', 'High Risk'],
+        datasets: [{
+          data: [data.riskDistribution.low, data.riskDistribution.moderate, data.riskDistribution.high],
+          backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+          borderWidth: 4,
+          borderColor: '#ffffff'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '75%',
+        plugins: { legend: { display: false } }
+      }
+    });
+
+    // Infill Dynamic Records List (with dynamic SVG switching logic)
+    const recordList = document.getElementById('recent-records-container');
+    recordList.innerHTML = data.recentScreenings.map(item => {
+      let iconSvg = '';
+      if (item.type === 'heart') {
+        iconSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
+      } else if (item.type === 'diabetes') {
+        iconSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>`;
+      } else if (item.type === 'parkinson') {
+        iconSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1 0-4.12 2.5 2.5 0 0 1 0-4.88 2.5 2.5 0 0 1 0-4.12A2.5 2.5 0 0 1 9.5 2zM14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44 2.5 2.5 0 0 0 0-4.12 2.5 2.5 0 0 0 0-4.88 2.5 2.5 0 0 0 0-4.12A2.5 2.5 0 0 0 14.5 2z"/></svg>`;
+      }
+
+      return `
+        <li class="record-item">
+          <div class="record-left">
+            <div class="record-icon ${item.type}">${iconSvg}</div>
+            <div>
+              <div class="record-name">${item.name}</div>
+              <div class="record-meta">Age ${item.age} • ${item.date}</div>
+            </div>
+          </div>
+          <div class="record-right">
+            <span class="record-prob">${item.probability}% probability</span>
+            <span class="badge ${item.risk}">${item.risk}</span>
+          </div>
+        </li>
+      `;
+    }).join('');
+  });
+</script>
+
+</body>
+</html>
