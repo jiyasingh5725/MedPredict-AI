@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Heart Disease Screening — MedAI</title>
+  <title>Diabetes Screening — MedAI</title>
 
   <style>
     /* ── Reset & Base ─────────────────────────────────────────────────────── */
@@ -20,6 +20,8 @@
       --primary: hsl(187, 85%, 25%);
       --primary-10: hsl(187, 85%, 95%);
       --primary-20: hsl(187, 85%, 90%);
+      --blue-accent: hsl(210, 70%, 55%);
+      --blue-10: hsl(210, 70%, 93%);
       --navy: hsl(215, 25%, 27%);
       --bg: hsl(210, 40%, 98%);
       --card: #ffffff;
@@ -60,14 +62,12 @@
       z-index: 100;
     }
 
-    /* Refactored Brand to accurately mimic logo layout in image_935ac2.png */
     .nav-brand {
       display: flex;
       align-items: center;
       gap: 12px;
       font-weight: 700;
       font-size: 26px;
-      /* Larger emphasis scale */
       color: var(--primary);
       text-decoration: none;
       letter-spacing: -0.02em;
@@ -101,7 +101,6 @@
     /* ── Expanded Page Layout ─────────────────────────────────────────────── */
     .page {
       max-width: 920px;
-      /* Made the layout form size larger scale */
       margin: 0 auto;
       padding: 44px 24px 80px;
     }
@@ -117,7 +116,7 @@
       width: 52px;
       height: 52px;
       border-radius: 14px;
-      background: var(--primary-10);
+      background: var(--blue-10);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -147,7 +146,6 @@
       border: 1px solid var(--border);
       border-radius: var(--radius);
       padding: 32px;
-      /* Amplified inner padding */
       box-shadow: var(--shadow);
       margin-bottom: 24px;
     }
@@ -169,7 +167,6 @@
     .form-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      /* Roomier cells */
       gap: 24px;
     }
 
@@ -191,12 +188,9 @@
       margin-top: -2px;
     }
 
-    /* Larger Form Inputs */
-    input[type="number"],
-    select {
+    input[type="number"] {
       width: 100%;
       padding: 12px 16px;
-      /* Enlarged element touch targets */
       border: 1px solid var(--border);
       border-radius: 8px;
       font-size: 15px;
@@ -204,32 +198,11 @@
       background: var(--card);
       outline: none;
       transition: border-color .2s, box-shadow .2s;
-      appearance: none;
-      -webkit-appearance: none;
     }
 
-    input[type="number"]:focus,
-    select:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 4px var(--primary-20);
-    }
-
-    .select-wrap {
-      position: relative;
-    }
-
-    .select-wrap::after {
-      content: "";
-      position: absolute;
-      right: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 0;
-      height: 0;
-      border-left: 5px solid transparent;
-      border-right: 5px solid transparent;
-      border-top: 5px solid var(--muted);
-      pointer-events: none;
+    input[type="number"]:focus {
+      border-color: var(--blue-accent);
+      box-shadow: 0 0 0 4px var(--blue-10);
     }
 
     .error-msg {
@@ -239,11 +212,11 @@
       margin-top: 2px;
     }
 
-    /* ── Enhanced Action Button Actions ───────────────────────────────────── */
+    /* ── Action Button ────────────────────────────────────────────────────── */
     .btn-primary {
       width: 100%;
       padding: 16px;
-      background: var(--primary);
+      background: var(--blue-accent);
       color: #fff;
       border: none;
       border-radius: 12px;
@@ -259,7 +232,7 @@
     }
 
     .btn-primary:hover {
-      background: hsl(187, 85%, 18%);
+      background: hsl(210, 70%, 45%);
     }
 
     .btn-primary:disabled {
@@ -286,8 +259,8 @@
     }
 
     .btn-outline:hover {
-      border-color: var(--primary);
-      background: var(--primary-10);
+      border-color: var(--blue-accent);
+      background: var(--blue-10);
     }
 
     /* ── Result UI Blocks ─────────────────────────────────────────────────── */
@@ -531,7 +504,6 @@
       margin-top: 14px;
     }
 
-    /* Loading Micro-interactions */
     @keyframes spin {
       to {
         transform: rotate(360deg);
@@ -584,10 +556,8 @@
 
 <body>
 
-  <!-- ── Navbar (Incorporating explicit branding specifications from image_935ac2.png) ── -->
   <nav>
     <a href="#" class="nav-brand">
-      <!-- SVG markup representing verbatim vector elements from image_935ac2.png -->
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round"
         stroke-linejoin="round">
         <path d="M3 12h3l3-9 4 18 3-13 1 4h4" />
@@ -597,232 +567,139 @@
     <ul class="nav-links">
       <li><a href="/">Home</a></li>
       <li><a href="/dashboard">Dashboard</a></li>
-      <li><a href="/heart" class="active">Heart AI</a></li>
-      <li><a href="/diabetes">Diabetes AI</a></li>
+      <li><a href="/heart">Heart AI</a></li>
+      <li><a href="/diabetes" class="active">Diabetes AI</a></li>
       <li><a href="/parkinsons">Parkinson AI</a></li>
       <li><a href="/history">History</a></li>
       <li><a href="/logout" class="logout-link">Log Out</a></li>
     </ul>
   </nav>
 
-  <!-- ── Page Wrapper ── -->
   <div class="page">
 
-    <!-- Page Header -->
     <div class="page-header">
       <div class="page-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round"
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--blue-accent)" stroke-width="2" stroke-linecap="round"
           stroke-linejoin="round">
-          <path
-            d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+          <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
         </svg>
       </div>
       <div>
-        <h1>Heart Disease Screening</h1>
-        <p>Enter clinical biomarkers to assess cardiovascular disease risk using ML</p>
+        <h1>Diabetes Disease Screening</h1>
+        <p>Enter metabolic biomarkers to evaluate glycemic risk indexes using ML diagnostic parameters</p>
       </div>
     </div>
 
-    <!-- Disclaimer Information Alert -->
     <div class="disclaimer">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <circle cx="12" cy="12" r="10" />
         <line x1="12" y1="8" x2="12" y2="12" />
         <line x1="12" y1="16" x2="12.01" y2="16" />
       </svg>
-      For informational and educational purposes only. Always consult a qualified medical professional for diagnosis and
-      treatment.
+      For informational and educational purposes only. Always consult a qualified medical professional for metabolic
+      diagnosis and treatment.
     </div>
 
-    <!-- ── LARGE FORM ENTRY BLOCK ── -->
     <div id="formSection">
-      <form id="heartForm" novalidate>
+      <form id="diabetesForm" novalidate>
 
-        <!-- Section: Demographics -->
         <div class="card">
-          <div class="card-title">Patient Demographics</div>
-          <div class="card-desc">Basic patient configuration properties</div>
+          <div class="card-title">Maternal & Basic Demographics</div>
+          <div class="card-desc">Basic structural lineage properties</div>
           <div class="form-grid">
 
             <div class="form-field">
-              <label for="age">Age (years)</label>
-              <input type="number" id="age" name="age" min="1" max="120" value="54" placeholder="e.g. 54" />
-              <span class="error-msg" id="err-age"></span>
+              <label for="Age">Age (years)</label>
+              <input type="number" id="Age" name="Age" min="1" max="120" value="33" placeholder="e.g. 33" />
+              <span class="error-msg" id="err-Age"></span>
             </div>
 
             <div class="form-field">
-              <label for="sex">Sex</label>
-              <div class="select-wrap">
-                <select id="sex" name="sex">
-                  <option value="1">Male</option>
-                  <option value="0">Female</option>
-                </select>
-              </div>
-              <span class="error-msg"></span>
+              <label for="Pregnancies">Pregnancies</label>
+              <input type="number" id="Pregnancies" name="Pregnancies" min="0" max="25" value="1"
+                placeholder="0 if not applicable" />
+              <span class="field-hint">Total times pregnant</span>
+              <span class="error-msg" id="err-Pregnancies"></span>
             </div>
 
           </div>
         </div>
 
-        <!-- Section: Vitals & Labs -->
         <div class="card">
-          <div class="card-title">Vital Signs &amp; Lab Results</div>
-          <div class="card-desc">Measured metrics computed inside target clinical environment parameters</div>
+          <div class="card-title">Physiological &amp; Metabolic Profiling</div>
+          <div class="card-desc">Key clinical biomarkers tracked within blood serum diagnostics</div>
           <div class="form-grid">
 
             <div class="form-field">
-              <label for="trestbps">Resting Blood Pressure (trestbps)</label>
-              <input type="number" id="trestbps" name="trestbps" min="50" max="250" value="130" />
+              <label for="Glucose">Plasma Glucose Concentration (Glucose)</label>
+              <input type="number" id="Glucose" name="Glucose" min="0" max="300" value="115" />
+              <span class="field-hint">2 hours in an oral glucose tolerance test (mg/dL)</span>
+              <span class="error-msg" id="err-Glucose"></span>
+            </div>
+
+            <div class="form-field">
+              <label for="BloodPressure">Diastolic Blood Pressure (BloodPressure)</label>
+              <input type="number" id="BloodPressure" name="BloodPressure" min="0" max="200" value="70" />
               <span class="field-hint">mm Hg</span>
-              <span class="error-msg" id="err-trestbps"></span>
+              <span class="error-msg" id="err-BloodPressure"></span>
             </div>
 
             <div class="form-field">
-              <label for="chol">Cholesterol (chol)</label>
-              <input type="number" id="chol" name="chol" min="0" max="600" value="246" />
-              <span class="field-hint">mg/dL serum</span>
-              <span class="error-msg" id="err-chol"></span>
+              <label for="SkinThickness">Triceps Skin Fold Thickness (SkinThickness)</label>
+              <input type="number" id="SkinThickness" name="SkinThickness" min="0" max="100" value="20" />
+              <span class="field-hint">mm</span>
+              <span class="error-msg" id="err-SkinThickness"></span>
             </div>
 
             <div class="form-field">
-              <label for="thalach">Max Heart Rate (thalach)</label>
-              <input type="number" id="thalach" name="thalach" min="60" max="250" value="150" />
-              <span class="field-hint">bpm achieved</span>
-              <span class="error-msg" id="err-thalach"></span>
+              <label for="Insulin">2-Hour Serum Insulin (Insulin)</label>
+              <input type="number" id="Insulin" name="Insulin" min="0" max="900" value="85" />
+              <span class="field-hint">mu U/ml</span>
+              <span class="error-msg" id="err-Insulin"></span>
             </div>
 
             <div class="form-field">
-              <label for="oldpeak">ST Depression (oldpeak)</label>
-              <input type="number" id="oldpeak" name="oldpeak" min="-3" max="10" step="0.1" value="1.0" />
-              <span class="field-hint">Exercise vs rest condition matrix</span>
-              <span class="error-msg" id="err-oldpeak"></span>
+              <label for="BMI">Body Mass Index (BMI)</label>
+              <input type="number" id="BMI" name="BMI" min="0" max="80" step="0.1" value="28.4" />
+              <span class="field-hint">weight in kg/(height in m)²</span>
+              <span class="error-msg" id="err-BMI"></span>
             </div>
 
             <div class="form-field">
-              <label for="fbs">Fasting Blood Sugar &gt; 120 mg/dL (fbs)</label>
-              <div class="select-wrap">
-                <select id="fbs" name="fbs">
-                  <option value="0">No</option>
-                  <option value="1">Yes</option>
-                </select>
-              </div>
-              <span class="error-msg"></span>
+              <label for="DiabetesPedigreeFunction">Diabetes Pedigree Function</label>
+              <input type="number" id="DiabetesPedigreeFunction" name="DiabetesPedigreeFunction" min="0.0" max="3.0"
+                step="0.001" value="0.415" />
+              <span class="field-hint">Genetic history score scoring metric</span>
+              <span class="error-msg" id="err-DiabetesPedigreeFunction"></span>
             </div>
 
           </div>
         </div>
 
-        <!-- Section: Clinical Findings -->
-        <div class="card">
-          <div class="card-title">Clinical Findings</div>
-          <div class="card-desc">ECG properties and exercise diagnostics vectors</div>
-          <div class="form-grid">
-
-            <div class="form-field">
-              <label for="cp">Chest Pain Type (cp)</label>
-              <div class="select-wrap">
-                <select id="cp" name="cp">
-                  <option value="0">Typical Angina</option>
-                  <option value="1">Atypical Angina</option>
-                  <option value="2">Non-anginal Pain</option>
-                  <option value="3">Asymptomatic</option>
-                </select>
-              </div>
-              <span class="error-msg"></span>
-            </div>
-
-            <div class="form-field">
-              <label for="restecg">Resting ECG Results (restecg)</label>
-              <div class="select-wrap">
-                <select id="restecg" name="restecg">
-                  <option value="0">Normal</option>
-                  <option value="1">ST-T Wave Abnormality</option>
-                  <option value="2">Left Ventricular Hypertrophy</option>
-                </select>
-              </div>
-              <span class="error-msg"></span>
-            </div>
-
-            <div class="form-field">
-              <label for="exang">Exercise Induced Angina (exang)</label>
-              <div class="select-wrap">
-                <select id="exang" name="exang">
-                  <option value="0">No</option>
-                  <option value="1">Yes</option>
-                </select>
-              </div>
-              <span class="error-msg"></span>
-            </div>
-
-            <div class="form-field">
-              <label for="slope">ST Segment Slope (slope)</label>
-              <div class="select-wrap">
-                <select id="slope" name="slope">
-                  <option value="0">Upsloping</option>
-                  <option value="1">Flat</option>
-                  <option value="2">Downsloping</option>
-                </select>
-              </div>
-              <span class="error-msg"></span>
-            </div>
-
-            <div class="form-field">
-              <label for="ca">Major Vessels (ca)</label>
-              <div class="select-wrap">
-                <select id="ca" name="ca">
-                  <option value="0">0</option>
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                </select>
-              </div>
-              <span class="error-msg"></span>
-            </div>
-
-            <div class="form-field">
-              <label for="thal">Thalassemia (thal)</label>
-              <div class="select-wrap">
-                <select id="thal" name="thal">
-                  <option value="0">Unknown</option>
-                  <option value="1">Normal</option>
-                  <option value="2" selected>Fixed Defect</option>
-                  <option value="3">Reversible Defect</option>
-                </select>
-              </div>
-              <span class="error-msg"></span>
-            </div>
-
-          </div>
-        </div>
-
-        <!-- Action Execution Element -->
         <button type="submit" class="btn-primary" id="submitBtn">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path
-              d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
           </svg>
-          Run Heart Disease Analysis
+          Run Diabetes Screening Analysis
         </button>
 
       </form>
     </div>
 
-    <!-- ── OUTPUT METRIC REPORT INSIGHT PANELS ── -->
     <div id="resultSection">
 
-      <!-- Risk Level Notification Area -->
       <div class="result-banner" id="resultBanner">
         <div class="banner-top">
-          <svg id="bannerIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"></svg>
+          <svg id="bannerIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round"></svg>
           <h2 id="bannerTitle"></h2>
         </div>
         <div class="result-body">
-          <!-- Probability Display Vector -->
           <div class="gauge-wrap">
             <canvas id="gaugeCanvas" width="150" height="150"></canvas>
             <div class="gauge-label">probability</div>
           </div>
-          <!-- Data Table Meta Results -->
           <div class="result-stats">
             <div class="result-row">
               <span class="label">Prediction</span>
@@ -840,18 +717,16 @@
         </div>
       </div>
 
-      <!-- Machine Learning Local Feature Importance Weights -->
       <div class="card">
         <div class="card-title">Top Contributing Risk Factors</div>
-        <div class="card-desc" style="margin-bottom:16px">Features that most heavily weighted the logistical target
-          inference</div>
+        <div class="card-desc" style="margin-bottom:16px">Biomarkers that most heavily loaded the model risk analysis
+          outcome calculation</div>
         <ul class="factor-list" id="factorList"></ul>
       </div>
 
-      <!-- Recommendations Engine Output Card -->
       <div class="rec-card">
         <div class="rec-title">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--blue-accent)" stroke-width="2">
             <circle cx="12" cy="12" r="10" />
             <line x1="12" y1="8" x2="12" y2="12" />
             <line x1="12" y1="16" x2="12.01" y2="16" />
@@ -859,17 +734,17 @@
           Recommendation
         </div>
         <p class="rec-text" id="recText"></p>
-        <p class="rec-disclaimer">This tool is for informational purposes only. Always consult a qualified medical
-          professional for diagnosis and treatment.</p>
+        <p class="rec-disclaimer">This predictive matrix outcome is for informational references only. Not intended to
+          replace laboratory diagnostic confirmation metrics.</p>
       </div>
 
-      <!-- Navigation Clear Action Trigger -->
       <button class="btn-outline" id="resetBtn">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
           <polyline points="1 4 1 10 7 10" />
           <path d="M3.51 15a9 9 0 1 0 .49-3.99" />
         </svg>
-        Run Another Screening
+        Run Another Metabolic Screening
       </button>
 
     </div>
@@ -878,10 +753,8 @@
 
   <footer
     style="border-top:1px solid var(--border);text-align:center;padding:32px 24px;font-size:13px;color:var(--muted)">
-    <p>MedAI — Clinical Grade AI Predictive Architecture Engine</p>
-    <p style="margin-top:6px">For informational purposes only. Not medical advice.</p>
+    <p>MedAI — Clinical Grade AI Predictive Architecture Infrastructure</p>
   </footer>
-
 
   <script>
     /* ═══════════════════════════════════════════════════════════════════════════
@@ -899,14 +772,12 @@
 
       ctx.clearRect(0, 0, 150, 150);
 
-      // Background Track Arc
       ctx.beginPath();
       ctx.arc(cx, cy, r, 0, Math.PI * 2);
       ctx.strokeStyle = trackColor;
       ctx.lineWidth = 12;
       ctx.stroke();
 
-      // Highlight Fill
       const endAngle = -Math.PI / 2 + (pct / 100) * Math.PI * 2;
       ctx.beginPath();
       ctx.arc(cx, cy, r, -Math.PI / 2, endAngle);
@@ -915,7 +786,6 @@
       ctx.lineCap = "round";
       ctx.stroke();
 
-      // Context Metrics Text Info
       ctx.font = "bold 26px -apple-system, sans-serif";
       ctx.fillStyle = "#0f172a";
       ctx.textAlign = "center";
@@ -923,46 +793,35 @@
       ctx.fillText(pct + "%", cx, cy);
     }
 
-
     /* ═══════════════════════════════════════════════════════════════════════════
        RUNTIME FORM HANDLERS & ERROR INTERCEPTORS
        ═══════════════════════════════════════════════════════════════════════════ */
 
     function getFormData() {
       return {
-        age: document.getElementById("age").value,
-        sex: document.getElementById("sex").value,
-        cp: document.getElementById("cp").value,
-        trestbps: document.getElementById("trestbps").value,
-        chol: document.getElementById("chol").value,
-        fbs: document.getElementById("fbs").value,
-        restecg: document.getElementById("restecg").value,
-        thalach: document.getElementById("thalach").value,
-        exang: document.getElementById("exang").value,
-        oldpeak: document.getElementById("oldpeak").value,
-        slope: document.getElementById("slope").value,
-        ca: document.getElementById("ca").value,
-        thal: document.getElementById("thal").value,
+        Pregnancies: document.getElementById("Pregnancies").value,
+        Glucose: document.getElementById("Glucose").value,
+        BloodPressure: document.getElementById("BloodPressure").value,
+        SkinThickness: document.getElementById("SkinThickness").value,
+        Insulin: document.getElementById("Insulin").value,
+        BMI: document.getElementById("BMI").value,
+        DiabetesPedigreeFunction: document.getElementById("DiabetesPedigreeFunction").value,
+        Age: document.getElementById("Age").value,
       };
     }
 
     function validate(data) {
       const errors = {};
-      if (!data.age || data.age < 1 || data.age > 120)
-        errors.age = "Enter a valid age (1–120)";
-      if (!data.trestbps || data.trestbps < 50 || data.trestbps > 250)
-        errors.trestbps = "Enter a valid BP (50–250)";
-      if (!data.chol || data.chol < 0 || data.chol > 600)
-        errors.chol = "Enter a valid value (0–600)";
-      if (!data.thalach || data.thalach < 60 || data.thalach > 250)
-        errors.thalach = "Enter a valid HR (60–250)";
-      if (data.oldpeak === "" || data.oldpeak < -3 || data.oldpeak > 10)
-        errors.oldpeak = "Enter a valid value (−3 to 10)";
+      if (!data.Age || data.Age < 1 || data.Age > 120) errors.Age = "Enter a valid age";
+      if (data.Pregnancies === "" || data.Pregnancies < 0) errors.Pregnancies = "Value cannot be negative";
+      if (!data.Glucose || data.Glucose < 0) errors.Glucose = "Enter valid Plasma Glucose concentration";
+      if (!data.BloodPressure || data.BloodPressure < 0) errors.BloodPressure = "Enter valid Diastolic metric";
+      if (!data.BMI || data.BMI < 0) errors.BMI = "Enter valid target body index scale value";
       return errors;
     }
 
     function clearErrors() {
-      ["age", "trestbps", "chol", "thalach", "oldpeak"].forEach(id => {
+      ["Age", "Pregnancies", "Glucose", "BloodPressure", "BMI"].forEach(id => {
         const el = document.getElementById("err-" + id);
         if (el) el.textContent = "";
       });
@@ -974,7 +833,6 @@
         if (el) el.textContent = msg;
       });
     }
-
 
     /* ═══════════════════════════════════════════════════════════════════════════
        REPORT LAYOUT RENDERING ENGINE
@@ -1000,17 +858,16 @@
       document.getElementById("bannerIcon").innerHTML = iconSvg;
       document.getElementById("bannerIcon").style.color = bc.text;
 
-      const riskLabels = { low: "Low Risk Detected", moderate: "Moderate Risk Detected", high: "High Risk Detected" };
+      const riskLabels = { low: "Optimal Metabolic Baseline", moderate: "Metabolic Warning Threshold Met", high: "Critical Path Risk Profile Identified" };
       document.getElementById("bannerTitle").textContent = riskLabels[result.riskLevel] || "Analysis Complete";
 
       drawGauge(result.probability);
 
       document.getElementById("resPrediction").textContent =
-        result.target === 1 ? "Positive (Disease Detected)" : "Negative (No Disease)";
+        result.Outcome === 1 ? "Positive (Diabetic Pattern Confirmed)" : "Negative (No Trend Found)";
 
       const badgeEl = document.getElementById("resRiskBadge");
       badgeEl.innerHTML = `<span class="badge ${result.riskLevel}">${result.riskLevel.toUpperCase()} RISK</span>`;
-
       document.getElementById("resConfidence").textContent = pct + "%";
 
       const list = document.getElementById("factorList");
@@ -1039,12 +896,11 @@
       document.getElementById("recText").textContent = result.recommendation;
     }
 
-
     /* ═══════════════════════════════════════════════════════════════════════════
-       FORM ASYNC SUBMISSION ARCHITECTURE (LIVE MODEL COUPLING)
+       FORM ASYNC SUBMISSION ARCHITECTURE (BACKEND INTERACTION)
        ═══════════════════════════════════════════════════════════════════════════ */
 
-    document.getElementById("heartForm").addEventListener("submit", function (e) {
+    document.getElementById("diabetesForm").addEventListener("submit", function (e) {
       e.preventDefault();
       clearErrors();
 
@@ -1058,10 +914,10 @@
 
       const btn = document.getElementById("submitBtn");
       btn.disabled = true;
-      btn.innerHTML = '<span class="spinner">⟳</span> Querying Live Heart Disease Risk RandomForest Classifier Pipeline...';
+      btn.innerHTML = '<span class="spinner">⟳</span> Querying Live RandomForest Inference Pipeline Engine...';
 
-      // Issue dynamic AJAX network POST query to Flask endpoints
-      fetch("/predict-heart", {
+      // Make an AJAX call to the Flask Backend Route
+      fetch("/predict-diabetes", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -1069,11 +925,11 @@
         body: JSON.stringify(data)
       })
         .then(response => {
-          if (!response.ok) throw new Error("Inference Network Communication Error");
+          if (!response.ok) throw new Error("Pipeline Inference Network Error");
           return response.json();
         })
         .then(result => {
-          // Forward parsed scikit-learn results directly to the graphics engine
+          // Render the layout using real predictive matrix responses
           renderResult(result);
 
           document.getElementById("formSection").style.display = "none";
@@ -1082,23 +938,22 @@
         })
         .catch(err => {
           console.error(err);
-          alert("Inference computation failure while communicating with the Flask cardiovascular models pipeline.");
+          alert("Inference processing error occurred while communicating with Flask ML models pipeline.");
         })
         .finally(() => {
           btn.disabled = false;
           btn.innerHTML = `
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
       </svg>
-      Run Heart Disease Analysis`;
+      Run Diabetes Screening Analysis`;
         });
     });
 
-    /* Reset UI State Action */
     document.getElementById("resetBtn").addEventListener("click", function () {
       document.getElementById("resultSection").style.display = "none";
       document.getElementById("formSection").style.display = "block";
-      document.getElementById("heartForm").reset();
+      document.getElementById("diabetesForm").reset();
       clearErrors();
       window.scrollTo({ top: 0, behavior: "smooth" });
     });

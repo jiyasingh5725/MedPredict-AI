@@ -438,6 +438,20 @@ body {
     font-size: 0.85rem;
 }
 
+.nav-links a.logout-link {
+  color: #ef4444;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 8px;
+  background: transparent;
+  transition: all 0.2s ease;
+}
+
+.nav-links a.logout-link:hover {
+  background: #fee2e2; /* Soft red background box */
+  color: #991b1b;       /* Deep clinical red text color */
+}
+
 /* --- Responsive Layout Adjustments --- */
 @media (max-width: 1024px) {
     .hero-container {

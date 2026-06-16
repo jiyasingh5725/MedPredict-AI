@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Heart Disease Screening — MedAI</title>
+  <title>Parkinson Screening — MedAI</title>
 
   <style>
     /* ── Reset & Base ─────────────────────────────────────────────────────── */
@@ -20,6 +20,8 @@
       --primary: hsl(187, 85%, 25%);
       --primary-10: hsl(187, 85%, 95%);
       --primary-20: hsl(187, 85%, 90%);
+      --purple-accent: hsl(258, 90%, 66%);
+      --purple-10: hsl(258, 90%, 96%);
       --navy: hsl(215, 25%, 27%);
       --bg: hsl(210, 40%, 98%);
       --card: #ffffff;
@@ -60,14 +62,12 @@
       z-index: 100;
     }
 
-    /* Refactored Brand to accurately mimic logo layout in image_935ac2.png */
     .nav-brand {
       display: flex;
       align-items: center;
       gap: 12px;
       font-weight: 700;
       font-size: 26px;
-      /* Larger emphasis scale */
       color: var(--primary);
       text-decoration: none;
       letter-spacing: -0.02em;
@@ -101,7 +101,6 @@
     /* ── Expanded Page Layout ─────────────────────────────────────────────── */
     .page {
       max-width: 920px;
-      /* Made the layout form size larger scale */
       margin: 0 auto;
       padding: 44px 24px 80px;
     }
@@ -117,7 +116,7 @@
       width: 52px;
       height: 52px;
       border-radius: 14px;
-      background: var(--primary-10);
+      background: var(--purple-10);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -127,6 +126,7 @@
     .page-icon svg {
       width: 26px;
       height: 26px;
+      color: var(--purple-accent);
     }
 
     .page-header h1 {
@@ -147,7 +147,6 @@
       border: 1px solid var(--border);
       border-radius: var(--radius);
       padding: 32px;
-      /* Amplified inner padding */
       box-shadow: var(--shadow);
       margin-bottom: 24px;
     }
@@ -169,7 +168,6 @@
     .form-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      /* Roomier cells */
       gap: 24px;
     }
 
@@ -191,12 +189,10 @@
       margin-top: -2px;
     }
 
-    /* Larger Form Inputs */
-    input[type="number"],
-    select {
+    input[type="text"],
+    input[type="number"] {
       width: 100%;
       padding: 12px 16px;
-      /* Enlarged element touch targets */
       border: 1px solid var(--border);
       border-radius: 8px;
       font-size: 15px;
@@ -204,32 +200,12 @@
       background: var(--card);
       outline: none;
       transition: border-color .2s, box-shadow .2s;
-      appearance: none;
-      -webkit-appearance: none;
     }
 
-    input[type="number"]:focus,
-    select:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 4px var(--primary-20);
-    }
-
-    .select-wrap {
-      position: relative;
-    }
-
-    .select-wrap::after {
-      content: "";
-      position: absolute;
-      right: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 0;
-      height: 0;
-      border-left: 5px solid transparent;
-      border-right: 5px solid transparent;
-      border-top: 5px solid var(--muted);
-      pointer-events: none;
+    input[type="text"]:focus,
+    input[type="number"]:focus {
+      border-color: var(--purple-accent);
+      box-shadow: 0 0 0 4px var(--purple-10);
     }
 
     .error-msg {
@@ -239,11 +215,11 @@
       margin-top: 2px;
     }
 
-    /* ── Enhanced Action Button Actions ───────────────────────────────────── */
+    /* ── Action Button ────────────────────────────────────────────────────── */
     .btn-primary {
       width: 100%;
       padding: 16px;
-      background: var(--primary);
+      background: var(--purple-accent);
       color: #fff;
       border: none;
       border-radius: 12px;
@@ -259,7 +235,7 @@
     }
 
     .btn-primary:hover {
-      background: hsl(187, 85%, 18%);
+      background: hsl(258, 90%, 56%);
     }
 
     .btn-primary:disabled {
@@ -286,8 +262,8 @@
     }
 
     .btn-outline:hover {
-      border-color: var(--primary);
-      background: var(--primary-10);
+      border-color: var(--purple-accent);
+      background: var(--purple-10);
     }
 
     /* ── Result UI Blocks ─────────────────────────────────────────────────── */
@@ -497,7 +473,7 @@
 
     .factor-tag.low {
       background: #dcfce7;
-      color: #166534;
+      color: #166434;
     }
 
     /* Recommendations */
@@ -531,7 +507,6 @@
       margin-top: 14px;
     }
 
-    /* Loading Micro-interactions */
     @keyframes spin {
       to {
         transform: rotate(360deg);
@@ -584,10 +559,8 @@
 
 <body>
 
-  <!-- ── Navbar (Incorporating explicit branding specifications from image_935ac2.png) ── -->
   <nav>
     <a href="#" class="nav-brand">
-      <!-- SVG markup representing verbatim vector elements from image_935ac2.png -->
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round"
         stroke-linejoin="round">
         <path d="M3 12h3l3-9 4 18 3-13 1 4h4" />
@@ -597,261 +570,259 @@
     <ul class="nav-links">
       <li><a href="/">Home</a></li>
       <li><a href="/dashboard">Dashboard</a></li>
-      <li><a href="/heart" class="active">Heart AI</a></li>
+      <li><a href="/heart">Heart AI</a></li>
       <li><a href="/diabetes">Diabetes AI</a></li>
-      <li><a href="/parkinsons">Parkinson AI</a></li>
+      <li><a href="/parkinsons" class="active">Parkinson AI</a></li>
       <li><a href="/history">History</a></li>
       <li><a href="/logout" class="logout-link">Log Out</a></li>
     </ul>
   </nav>
 
-  <!-- ── Page Wrapper ── -->
   <div class="page">
 
-    <!-- Page Header -->
     <div class="page-header">
       <div class="page-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round"
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
           stroke-linejoin="round">
           <path
-            d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+            d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1 0-4.12 2.5 2.5 0 0 1 0-4.88 2.5 2.5 0 0 1 0-4.12A2.5 2.5 0 0 1 9.5 2zM14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44 2.5 2.5 0 0 0 0-4.12 2.5 2.5 0 0 0 0-4.88 2.5 2.5 0 0 0 0-4.12A2.5 2.5 0 0 0 14.5 2z" />
         </svg>
       </div>
       <div>
-        <h1>Heart Disease Screening</h1>
-        <p>Enter clinical biomarkers to assess cardiovascular disease risk using ML</p>
+        <h1>Parkinson Disease Screening</h1>
+        <p>Enter vocal acoustic and phonatory measurements to analyze neurological biomarkers using machine learning
+          models</p>
       </div>
     </div>
 
-    <!-- Disclaimer Information Alert -->
     <div class="disclaimer">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <circle cx="12" cy="12" r="10" />
         <line x1="12" y1="8" x2="12" y2="12" />
         <line x1="12" y1="16" x2="12.01" y2="16" />
       </svg>
-      For informational and educational purposes only. Always consult a qualified medical professional for diagnosis and
-      treatment.
+      For informational and educational purposes only. Always consult a medical specialist for definitive motor or
+      neurological clinical diagnostics.
     </div>
 
-    <!-- ── LARGE FORM ENTRY BLOCK ── -->
     <div id="formSection">
-      <form id="heartForm" novalidate>
+      <form id="parkinsonForm" novalidate>
 
-        <!-- Section: Demographics -->
         <div class="card">
-          <div class="card-title">Patient Demographics</div>
-          <div class="card-desc">Basic patient configuration properties</div>
+          <div class="card-title">Subject Identity Context</div>
+          <div class="card-desc">Patient registration identity identifier parameters</div>
           <div class="form-grid">
-
             <div class="form-field">
-              <label for="age">Age (years)</label>
-              <input type="number" id="age" name="age" min="1" max="120" value="54" placeholder="e.g. 54" />
-              <span class="error-msg" id="err-age"></span>
+              <label for="name">Subject Identifier Name (name)</label>
+              <input type="text" id="name" name="name" value="phon_R01_S01_1" placeholder="e.g., patient_id_alpha" />
+              <span class="error-msg" id="err-name"></span>
             </div>
-
-            <div class="form-field">
-              <label for="sex">Sex</label>
-              <div class="select-wrap">
-                <select id="sex" name="sex">
-                  <option value="1">Male</option>
-                  <option value="0">Female</option>
-                </select>
-              </div>
-              <span class="error-msg"></span>
-            </div>
-
           </div>
         </div>
 
-        <!-- Section: Vitals & Labs -->
         <div class="card">
-          <div class="card-title">Vital Signs &amp; Lab Results</div>
-          <div class="card-desc">Measured metrics computed inside target clinical environment parameters</div>
+          <div class="card-title">1. Vocal Fundamental Frequencies</div>
+          <div class="card-desc">Average, maximum, and minimum voice pitch parameters computed across voice recordings
+          </div>
           <div class="form-grid">
-
             <div class="form-field">
-              <label for="trestbps">Resting Blood Pressure (trestbps)</label>
-              <input type="number" id="trestbps" name="trestbps" min="50" max="250" value="130" />
-              <span class="field-hint">mm Hg</span>
-              <span class="error-msg" id="err-trestbps"></span>
+              <label for="MDVP_Fo_Hz">Average Pitch (MDVP:Fo(Hz))</label>
+              <input type="number" id="MDVP_Fo_Hz" name="MDVP_Fo_Hz" step="0.001" value="119.992" />
+              <span class="field-hint">Hz (Average pitch frequency)</span>
+              <span class="error-msg" id="err-MDVP_Fo_Hz"></span>
             </div>
-
             <div class="form-field">
-              <label for="chol">Cholesterol (chol)</label>
-              <input type="number" id="chol" name="chol" min="0" max="600" value="246" />
-              <span class="field-hint">mg/dL serum</span>
-              <span class="error-msg" id="err-chol"></span>
+              <label for="MDVP_Fhi_Hz">Maximum Pitch (MDVP:Fhi(Hz))</label>
+              <input type="number" id="MDVP_Fhi_Hz" name="MDVP_Fhi_Hz" step="0.001" value="157.302" />
+              <span class="field-hint">Hz (Maximum vocal frequency)</span>
+              <span class="error-msg" id="err-MDVP_Fhi_Hz"></span>
             </div>
-
             <div class="form-field">
-              <label for="thalach">Max Heart Rate (thalach)</label>
-              <input type="number" id="thalach" name="thalach" min="60" max="250" value="150" />
-              <span class="field-hint">bpm achieved</span>
-              <span class="error-msg" id="err-thalach"></span>
+              <label for="MDVP_Flo_Hz">Minimum Pitch (MDVP:Flo(Hz))</label>
+              <input type="number" id="MDVP_Flo_Hz" name="MDVP_Flo_Hz" step="0.001" value="74.997" />
+              <span class="field-hint">Hz (Minimum vocal frequency)</span>
+              <span class="error-msg" id="err-MDVP_Flo_Hz"></span>
             </div>
-
-            <div class="form-field">
-              <label for="oldpeak">ST Depression (oldpeak)</label>
-              <input type="number" id="oldpeak" name="oldpeak" min="-3" max="10" step="0.1" value="1.0" />
-              <span class="field-hint">Exercise vs rest condition matrix</span>
-              <span class="error-msg" id="err-oldpeak"></span>
-            </div>
-
-            <div class="form-field">
-              <label for="fbs">Fasting Blood Sugar &gt; 120 mg/dL (fbs)</label>
-              <div class="select-wrap">
-                <select id="fbs" name="fbs">
-                  <option value="0">No</option>
-                  <option value="1">Yes</option>
-                </select>
-              </div>
-              <span class="error-msg"></span>
-            </div>
-
           </div>
         </div>
 
-        <!-- Section: Clinical Findings -->
         <div class="card">
-          <div class="card-title">Clinical Findings</div>
-          <div class="card-desc">ECG properties and exercise diagnostics vectors</div>
+          <div class="card-title">2. Jitter Metric Modules (Frequency Perturbations)</div>
+          <div class="card-desc">Measures reflecting variations in baseline fundamental pitch period cycles</div>
           <div class="form-grid">
-
             <div class="form-field">
-              <label for="cp">Chest Pain Type (cp)</label>
-              <div class="select-wrap">
-                <select id="cp" name="cp">
-                  <option value="0">Typical Angina</option>
-                  <option value="1">Atypical Angina</option>
-                  <option value="2">Non-anginal Pain</option>
-                  <option value="3">Asymptomatic</option>
-                </select>
-              </div>
-              <span class="error-msg"></span>
+              <label for="MDVP_Jitter_Percent">MDVP:Jitter(%)</label>
+              <input type="number" id="MDVP_Jitter_Percent" name="MDVP_Jitter_Percent" step="0.00001" value="0.00784" />
+              <span class="error-msg" id="err-MDVP_Jitter_Percent"></span>
             </div>
-
             <div class="form-field">
-              <label for="restecg">Resting ECG Results (restecg)</label>
-              <div class="select-wrap">
-                <select id="restecg" name="restecg">
-                  <option value="0">Normal</option>
-                  <option value="1">ST-T Wave Abnormality</option>
-                  <option value="2">Left Ventricular Hypertrophy</option>
-                </select>
-              </div>
-              <span class="error-msg"></span>
+              <label for="MDVP_Jitter_Abs">MDVP:Jitter(Abs)</label>
+              <input type="number" id="MDVP_Jitter_Abs" name="MDVP_Jitter_Abs" step="0.000001" value="0.00007" />
+              <span class="error-msg" id="err-MDVP_Jitter_Abs"></span>
             </div>
-
             <div class="form-field">
-              <label for="exang">Exercise Induced Angina (exang)</label>
-              <div class="select-wrap">
-                <select id="exang" name="exang">
-                  <option value="0">No</option>
-                  <option value="1">Yes</option>
-                </select>
-              </div>
-              <span class="error-msg"></span>
+              <label for="MDVP_RAP">MDVP:RAP</label>
+              <input type="number" id="MDVP_RAP" name="MDVP_RAP" step="0.00001" value="0.00370" />
+              <span class="error-msg" id="err-MDVP_RAP"></span>
             </div>
-
             <div class="form-field">
-              <label for="slope">ST Segment Slope (slope)</label>
-              <div class="select-wrap">
-                <select id="slope" name="slope">
-                  <option value="0">Upsloping</option>
-                  <option value="1">Flat</option>
-                  <option value="2">Downsloping</option>
-                </select>
-              </div>
-              <span class="error-msg"></span>
+              <label for="MDVP_PPQ">MDVP:PPQ</label>
+              <input type="number" id="MDVP_PPQ" name="MDVP_PPQ" step="0.00001" value="0.00554" />
+              <span class="error-msg" id="err-MDVP_PPQ"></span>
             </div>
-
             <div class="form-field">
-              <label for="ca">Major Vessels (ca)</label>
-              <div class="select-wrap">
-                <select id="ca" name="ca">
-                  <option value="0">0</option>
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                </select>
-              </div>
-              <span class="error-msg"></span>
+              <label for="Jitter_DDP">Jitter:DDP</label>
+              <input type="number" id="Jitter_DDP" name="Jitter_DDP" step="0.00001" value="0.01109" />
+              <span class="error-msg" id="err-Jitter_DDP"></span>
             </div>
-
-            <div class="form-field">
-              <label for="thal">Thalassemia (thal)</label>
-              <div class="select-wrap">
-                <select id="thal" name="thal">
-                  <option value="0">Unknown</option>
-                  <option value="1">Normal</option>
-                  <option value="2" selected>Fixed Defect</option>
-                  <option value="3">Reversible Defect</option>
-                </select>
-              </div>
-              <span class="error-msg"></span>
-            </div>
-
           </div>
         </div>
 
-        <!-- Action Execution Element -->
+        <div class="card">
+          <div class="card-title">3. Shimmer Metric Modules (Amplitude Perturbations)</div>
+          <div class="card-desc">Measures reflecting absolute variations in vocal waveform cycles limits</div>
+          <div class="form-grid">
+            <div class="form-field">
+              <label for="MDVP_Shimmer">MDVP:Shimmer</label>
+              <input type="number" id="MDVP_Shimmer" name="MDVP_Shimmer" step="0.00001" value="0.04374" />
+              <span class="error-msg" id="err-MDVP_Shimmer"></span>
+            </div>
+            <div class="form-field">
+              <label for="MDVP_Shimmer_dB">MDVP:Shimmer(dB)</label>
+              <input type="number" id="MDVP_Shimmer_dB" name="MDVP_Shimmer_dB" step="0.001" value="0.426" />
+              <span class="error-msg" id="err-MDVP_Shimmer_dB"></span>
+            </div>
+            <div class="form-field">
+              <label for="Shimmer_APQ3">Shimmer:APQ3</label>
+              <input type="number" id="Shimmer_APQ3" name="Shimmer_APQ3" step="0.00001" value="0.02182" />
+              <span class="error-msg" id="err-Shimmer_APQ3"></span>
+            </div>
+            <div class="form-field">
+              <label for="Shimmer_APQ5">Shimmer:APQ5</label>
+              <input type="number" id="Shimmer_APQ5" name="Shimmer_APQ5" step="0.00001" value="0.03130" />
+              <span class="error-msg" id="err-Shimmer_APQ5"></span>
+            </div>
+            <div class="form-field">
+              <label for="MDVP_APQ">MDVP:APQ</label>
+              <input type="number" id="MDVP_APQ" name="MDVP_APQ" step="0.00001" value="0.02971" />
+              <span class="error-msg" id="err-MDVP_APQ"></span>
+            </div>
+            <div class="form-field">
+              <label for="Shimmer_DDA">Shimmer:DDA</label>
+              <input type="number" id="Shimmer_DDA" name="Shimmer_DDA" step="0.00001" value="0.06545" />
+              <span class="error-msg" id="err-Shimmer_DDA"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">4. Vocal Noise Components</div>
+          <div class="card-desc">Proportions of acoustic noise to clear harmonic structures in vocal tracking runs</div>
+          <div class="form-grid">
+            <div class="form-field">
+              <label for="NHR">Noise-to-Harmonic Ratio (NHR)</label>
+              <input type="number" id="NHR" name="NHR" step="0.00001" value="0.02211" />
+              <span class="error-msg" id="err-NHR"></span>
+            </div>
+            <div class="form-field">
+              <label for="HNR">Harmonics-to-Noise Ratio (HNR)</label>
+              <input type="number" id="HNR" name="HNR" step="0.001" value="21.033" />
+              <span class="field-hint">dB</span>
+              <span class="error-msg" id="err-HNR"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">5. Non-Linear Dynamical Scaling Matrices</div>
+          <div class="card-desc">Advanced signal complexity profiles measuring vocal fold stability microstructures
+          </div>
+          <div class="form-grid">
+            <div class="form-field">
+              <label for="RPDE">Recurrence Period Density Entropy (RPDE)</label>
+              <input type="number" id="RPDE" name="RPDE" step="0.000001" value="0.414783" />
+              <span class="error-msg" id="err-RPDE"></span>
+            </div>
+            <div class="form-field">
+              <label for="DFA">Detrended Fluctuation Analysis (DFA)</label>
+              <input type="number" id="DFA" name="DFA" step="0.000001" value="0.815285" />
+              <span class="error-msg" id="err-DFA"></span>
+            </div>
+            <div class="form-field">
+              <label for="spread1">Pitch Variation Measure 1 (spread1)</label>
+              <input type="number" id="spread1" name="spread1" step="0.000001" value="-4.813031" />
+              <span class="error-msg" id="err-spread1"></span>
+            </div>
+            <div class="form-field">
+              <label for="spread2">Pitch Variation Measure 2 (spread2)</label>
+              <input type="number" id="spread2" name="spread2" step="0.000001" value="0.266482" />
+              <span class="error-msg" id="err-spread2"></span>
+            </div>
+            <div class="form-field">
+              <label for="D2">Correlation Dimension (D2)</label>
+              <input type="number" id="D2" name="D2" step="0.000001" value="2.301442" />
+              <span class="error-msg" id="err-D2"></span>
+            </div>
+            <div class="form-field">
+              <label for="PPE">Pitch Period Entropy (PPE)</label>
+              <input type="number" id="PPE" name="PPE" step="0.000001" value="0.284654" />
+              <span class="error-msg" id="err-PPE"></span>
+            </div>
+          </div>
+        </div>
+
         <button type="submit" class="btn-primary" id="submitBtn">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
             <path
-              d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+              d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1 0-4.12 2.5 2.5 0 0 1 0-4.88 2.5 2.5 0 0 1 0-4.12A2.5 2.5 0 0 1 9.5 2zM14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44 2.5 2.5 0 0 0 0-4.12 2.5 2.5 0 0 0 0-4.88 2.5 2.5 0 0 0 0-4.12A2.5 2.5 0 0 0 14.5 2z" />
           </svg>
-          Run Heart Disease Analysis
+          Run Parkinson Disease Analysis
         </button>
 
       </form>
     </div>
 
-    <!-- ── OUTPUT METRIC REPORT INSIGHT PANELS ── -->
     <div id="resultSection">
 
-      <!-- Risk Level Notification Area -->
       <div class="result-banner" id="resultBanner">
         <div class="banner-top">
-          <svg id="bannerIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"></svg>
+          <svg id="bannerIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round"></svg>
           <h2 id="bannerTitle"></h2>
         </div>
         <div class="result-body">
-          <!-- Probability Display Vector -->
           <div class="gauge-wrap">
             <canvas id="gaugeCanvas" width="150" height="150"></canvas>
             <div class="gauge-label">probability</div>
           </div>
-          <!-- Data Table Meta Results -->
           <div class="result-stats">
             <div class="result-row">
-              <span class="label">Prediction</span>
+              <span class="label">Prediction Mapping</span>
               <span class="value" id="resPrediction"></span>
             </div>
             <div class="result-row">
-              <span class="label">Risk Level</span>
+              <span class="label">Risk Category State</span>
               <span class="value" id="resRiskBadge"></span>
             </div>
             <div class="result-row">
-              <span class="label">Confidence</span>
+              <span class="label">Mathematical Confidence</span>
               <span class="value" id="resConfidence"></span>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Machine Learning Local Feature Importance Weights -->
       <div class="card">
         <div class="card-title">Top Contributing Risk Factors</div>
-        <div class="card-desc" style="margin-bottom:16px">Features that most heavily weighted the logistical target
-          inference</div>
+        <div class="card-desc" style="margin-bottom:16px">Vocal components that added the heaviest weighting bias to the
+          status outcome classification</div>
         <ul class="factor-list" id="factorList"></ul>
       </div>
 
-      <!-- Recommendations Engine Output Card -->
       <div class="rec-card">
         <div class="rec-title">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--purple-accent)" stroke-width="2">
             <circle cx="12" cy="12" r="10" />
             <line x1="12" y1="8" x2="12" y2="12" />
             <line x1="12" y1="16" x2="12.01" y2="16" />
@@ -859,17 +830,17 @@
           Recommendation
         </div>
         <p class="rec-text" id="recText"></p>
-        <p class="rec-disclaimer">This tool is for informational purposes only. Always consult a qualified medical
-          professional for diagnosis and treatment.</p>
+        <p class="rec-disclaimer">This neurological inference configuration parameter is for screening indicator
+          purposes only. Always coordinate evaluations alongside physical gait analysis validation trees.</p>
       </div>
 
-      <!-- Navigation Clear Action Trigger -->
       <button class="btn-outline" id="resetBtn">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
           <polyline points="1 4 1 10 7 10" />
           <path d="M3.51 15a9 9 0 1 0 .49-3.99" />
         </svg>
-        Run Another Screening
+        Run Another Acoustic Screening
       </button>
 
     </div>
@@ -878,10 +849,8 @@
 
   <footer
     style="border-top:1px solid var(--border);text-align:center;padding:32px 24px;font-size:13px;color:var(--muted)">
-    <p>MedAI — Clinical Grade AI Predictive Architecture Engine</p>
-    <p style="margin-top:6px">For informational purposes only. Not medical advice.</p>
+    <p>MedAI — Clinical Grade AI Predictive Architecture Infrastructure Engine</p>
   </footer>
-
 
   <script>
     /* ═══════════════════════════════════════════════════════════════════════════
@@ -895,18 +864,16 @@
       const pct = Math.round(probability * 100);
 
       const trackColor = "#e2e8f0";
-      const fillColor = pct < 30 ? "#16a34a" : pct < 70 ? "#f59e0b" : "#ef4444";
+      const fillColor = pct < 35 ? "#16a34a" : pct < 65 ? "#f59e0b" : "#ef4444";
 
       ctx.clearRect(0, 0, 150, 150);
 
-      // Background Track Arc
       ctx.beginPath();
       ctx.arc(cx, cy, r, 0, Math.PI * 2);
       ctx.strokeStyle = trackColor;
       ctx.lineWidth = 12;
       ctx.stroke();
 
-      // Highlight Fill
       const endAngle = -Math.PI / 2 + (pct / 100) * Math.PI * 2;
       ctx.beginPath();
       ctx.arc(cx, cy, r, -Math.PI / 2, endAngle);
@@ -915,7 +882,6 @@
       ctx.lineCap = "round";
       ctx.stroke();
 
-      // Context Metrics Text Info
       ctx.font = "bold 26px -apple-system, sans-serif";
       ctx.fillStyle = "#0f172a";
       ctx.textAlign = "center";
@@ -923,46 +889,48 @@
       ctx.fillText(pct + "%", cx, cy);
     }
 
-
     /* ═══════════════════════════════════════════════════════════════════════════
-       RUNTIME FORM HANDLERS & ERROR INTERCEPTORS
+       RUNTIME FORM DATA ACQUISITION & INTEGRITY CONTROLS
        ═══════════════════════════════════════════════════════════════════════════ */
 
     function getFormData() {
       return {
-        age: document.getElementById("age").value,
-        sex: document.getElementById("sex").value,
-        cp: document.getElementById("cp").value,
-        trestbps: document.getElementById("trestbps").value,
-        chol: document.getElementById("chol").value,
-        fbs: document.getElementById("fbs").value,
-        restecg: document.getElementById("restecg").value,
-        thalach: document.getElementById("thalach").value,
-        exang: document.getElementById("exang").value,
-        oldpeak: document.getElementById("oldpeak").value,
-        slope: document.getElementById("slope").value,
-        ca: document.getElementById("ca").value,
-        thal: document.getElementById("thal").value,
+        name: document.getElementById("name").value,
+        MDVP_Fo_Hz: document.getElementById("MDVP_Fo_Hz").value,
+        MDVP_Fhi_Hz: document.getElementById("MDVP_Fhi_Hz").value,
+        MDVP_Flo_Hz: document.getElementById("MDVP_Flo_Hz").value,
+        MDVP_Jitter_Percent: document.getElementById("MDVP_Jitter_Percent").value,
+        MDVP_Jitter_Abs: document.getElementById("MDVP_Jitter_Abs").value,
+        MDVP_RAP: document.getElementById("MDVP_RAP").value,
+        MDVP_PPQ: document.getElementById("MDVP_PPQ").value,
+        Jitter_DDP: document.getElementById("Jitter_DDP").value,
+        MDVP_Shimmer: document.getElementById("MDVP_Shimmer").value,
+        MDVP_Shimmer_dB: document.getElementById("MDVP_Shimmer_dB").value,
+        Shimmer_APQ3: document.getElementById("Shimmer_APQ3").value,
+        Shimmer_APQ5: document.getElementById("Shimmer_APQ5").value,
+        MDVP_APQ: document.getElementById("MDVP_APQ").value,
+        Shimmer_DDA: document.getElementById("Shimmer_DDA").value,
+        NHR: document.getElementById("NHR").value,
+        HNR: document.getElementById("HNR").value,
+        RPDE: document.getElementById("RPDE").value,
+        DFA: document.getElementById("DFA").value,
+        spread1: document.getElementById("spread1").value,
+        spread2: document.getElementById("spread2").value,
+        D2: document.getElementById("D2").value,
+        PPE: document.getElementById("PPE").value,
       };
     }
 
     function validate(data) {
       const errors = {};
-      if (!data.age || data.age < 1 || data.age > 120)
-        errors.age = "Enter a valid age (1–120)";
-      if (!data.trestbps || data.trestbps < 50 || data.trestbps > 250)
-        errors.trestbps = "Enter a valid BP (50–250)";
-      if (!data.chol || data.chol < 0 || data.chol > 600)
-        errors.chol = "Enter a valid value (0–600)";
-      if (!data.thalach || data.thalach < 60 || data.thalach > 250)
-        errors.thalach = "Enter a valid HR (60–250)";
-      if (data.oldpeak === "" || data.oldpeak < -3 || data.oldpeak > 10)
-        errors.oldpeak = "Enter a valid value (−3 to 10)";
+      if (!data.name.trim()) errors.name = "Subject registration signature cannot be left blank";
+      if (!data.MDVP_Fo_Hz || data.MDVP_Fo_Hz <= 0) errors.MDVP_Fo_Hz = "Enter valid fundamental base frequency";
+      if (!data.HNR || data.HNR < 0) errors.HNR = "Enter a valid harmonic density tracking parameter";
       return errors;
     }
 
     function clearErrors() {
-      ["age", "trestbps", "chol", "thalach", "oldpeak"].forEach(id => {
+      ["name", "MDVP_Fo_Hz", "HNR"].forEach(id => {
         const el = document.getElementById("err-" + id);
         if (el) el.textContent = "";
       });
@@ -975,9 +943,8 @@
       });
     }
 
-
     /* ═══════════════════════════════════════════════════════════════════════════
-       REPORT LAYOUT RENDERING ENGINE
+       REPORT PANELS HYDRATION CONTROLLER
        ═══════════════════════════════════════════════════════════════════════════ */
 
     function renderResult(result) {
@@ -1000,17 +967,16 @@
       document.getElementById("bannerIcon").innerHTML = iconSvg;
       document.getElementById("bannerIcon").style.color = bc.text;
 
-      const riskLabels = { low: "Low Risk Detected", moderate: "Moderate Risk Detected", high: "High Risk Detected" };
+      const riskLabels = { low: "Normal Acoustic Baseline", moderate: "Acoustic Variations Detected", high: "Significant Phonatory Tremor Patterns Present" };
       document.getElementById("bannerTitle").textContent = riskLabels[result.riskLevel] || "Analysis Complete";
 
       drawGauge(result.probability);
 
       document.getElementById("resPrediction").textContent =
-        result.target === 1 ? "Positive (Disease Detected)" : "Negative (No Disease)";
+        result.status === 1 ? "Positive (Parkinson Characteristics Detected)" : "Negative (Baseline Cleared)";
 
       const badgeEl = document.getElementById("resRiskBadge");
-      badgeEl.innerHTML = `<span class="badge ${result.riskLevel}">${result.riskLevel.toUpperCase()} RISK</span>`;
-
+      badgeEl.innerHTML = `<span class="badge ${result.riskLevel}">${result.riskLevel.toUpperCase()} RISK STATE</span>`;
       document.getElementById("resConfidence").textContent = pct + "%";
 
       const list = document.getElementById("factorList");
@@ -1039,12 +1005,11 @@
       document.getElementById("recText").textContent = result.recommendation;
     }
 
-
     /* ═══════════════════════════════════════════════════════════════════════════
-       FORM ASYNC SUBMISSION ARCHITECTURE (LIVE MODEL COUPLING)
+       FORM ASYNC SUBMISSION ARCHITECTURE (LIVE PIPELINE HOOK)
        ═══════════════════════════════════════════════════════════════════════════ */
 
-    document.getElementById("heartForm").addEventListener("submit", function (e) {
+    document.getElementById("parkinsonForm").addEventListener("submit", function (e) {
       e.preventDefault();
       clearErrors();
 
@@ -1058,22 +1023,29 @@
 
       const btn = document.getElementById("submitBtn");
       btn.disabled = true;
-      btn.innerHTML = '<span class="spinner">⟳</span> Querying Live Heart Disease Risk RandomForest Classifier Pipeline...';
+      btn.innerHTML = '<span class="spinner">⟳</span> Connecting to live RandomForest Voice Diagnostic Pipeline Engine...';
 
       // Issue dynamic AJAX network POST query to Flask endpoints
-      fetch("/predict-heart", {
+      fetch("/predict-parkinsons", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
         body: JSON.stringify(data)
       })
-        .then(response => {
-          if (!response.ok) throw new Error("Inference Network Communication Error");
-          return response.json();
+        .then(async response => {
+          const isJson = response.headers.get('content-type')?.includes('application/json');
+          const resData = isJson ? await response.json() : null;
+
+          if (!response.ok) {
+            // If backend threw an explicit validation message, extract it here
+            const errorMsg = resData && resData.error ? resData.error : "Acoustic Pipeline Inference Error";
+            throw new Error(errorMsg);
+          }
+          return resData;
         })
         .then(result => {
-          // Forward parsed scikit-learn results directly to the graphics engine
+          // Map parsed scikit-learn results directly to the canvas graphics engine
           renderResult(result);
 
           document.getElementById("formSection").style.display = "none";
@@ -1081,28 +1053,28 @@
           window.scrollTo({ top: 0, behavior: "smooth" });
         })
         .catch(err => {
-          console.error(err);
-          alert("Inference computation failure while communicating with the Flask cardiovascular models pipeline.");
+          console.error("Diagnostic Error:", err);
+          alert("Inference computation failed: " + err.message);
         })
         .finally(() => {
           btn.disabled = false;
           btn.innerHTML = `
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1 0-4.12 2.5 2.5 0 0 1 0-4.88 2.5 2.5 0 0 1 0-4.12A2.5 2.5 0 0 1 9.5 2zM14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44 2.5 2.5 0 0 0 0-4.12 2.5 2.5 0 0 0 0-4.88 2.5 2.5 0 0 0 0-4.12A2.5 2.5 0 0 0 14.5 2z"/>
       </svg>
-      Run Heart Disease Analysis`;
+      Run Parkinson Disease Analysis`;
         });
     });
 
-    /* Reset UI State Action */
     document.getElementById("resetBtn").addEventListener("click", function () {
       document.getElementById("resultSection").style.display = "none";
       document.getElementById("formSection").style.display = "block";
-      document.getElementById("heartForm").reset();
+      document.getElementById("parkinsonForm").reset();
       clearErrors();
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
   </script>
+
 </body>
 
 </html>

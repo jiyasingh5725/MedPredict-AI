@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedAI — Predictive Health Intelligence</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i data-lucide="activity" class="logo-icon"></i>
+                <span>MedAI</span>
+            </div>
+            <nav class="nav-links">
+                <a href="{{ url_for('home') }}" class="active">Home</a>
+                <a href="{{ url_for('dashboard') }}" >Dashboard</a>
+                <a href="{{ url_for('heart') }}">Heart AI</a>
+                <a href="{{ url_for('diabetes') }}">Diabetes AI</a>
+                <a href="{{ url_for('parkinsons') }}">Parkinson AI</a>
+                <a href="{{ url_for('history') }}">History</a>
+                
+            </nav>
+
+            <nav class="nav-links">
+                <a href="{{ url_for('logout') }}" class="logout-link" >Log Out</a>
+
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero-section">
+        <div class="hero-container">
+            <div class="hero-content">
+                <div class="badge">
+                    <i data-lucide="activity" class="badge-icon"></i>
+                    <span>Clinical-grade screening</span>
+                </div>
+                <h1 class="hero-title">Predictive Health<br>Intelligence.</h1>
+                <p class="hero-description">
+                    MedAI uses advanced machine learning models to analyze key biomarkers and predict the risk of heart disease, diabetes, and neurological disorders with high clinical accuracy.
+                </p>
+                <div class="hero-cta-group">
+                    <a href="{{ url_for('heart') }}" class="btn btn-primary">
+                        <i data-lucide="heart" class="btn-icon"></i> Heart Screening
+                    </a>
+                    <a href="{{ url_for('diabetes') }}" class="btn btn-secondary">
+                        <i data-lucide="droplet" class="btn-icon"></i> Diabetes Screening
+                    </a>
+                    <a href="{{ url_for('parkinsons') }}" class="btn btn-primary-light">
+                        <i data-lucide="brain" class="btn-icon"></i> Parkinson Screening
+                    </a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="visualization-wrapper">
+                    <img src="https://www.clicdata.com/wp-content/uploads/2025/05/predictive-analytics-healthcare.jpg" alt="Medical AI Visualization" class="hero-img">
+                    <div class="image-overlay-badge">
+                        <i data-lucide="shield-check"></i> ML Model Analysis Active
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="how-it-works">
+        <div class="section-container">
+            <h2 class="section-title">How MedAI Works</h2>
+            <p class="section-subtitle">Our diagnostic models are trained on extensive clinical datasets to identify subtle physiological patterns and risk factors before symptoms emerge.</p>
+            
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="icon-wrapper">
+                        <i data-lucide="database"></i>
+                    </div>
+                    <h3>1. Input Biomarkers</h3>
+                    <p>Enter your latest lab results and physiological measurements. The platform accepts standard clinical data points.</p>
+                </div>
+                <div class="step-card highlight-card">
+                    <div class="icon-wrapper highlight-icon">
+                        <i data-lucide="cpu"></i>
+                    </div>
+                    <h3>2. ML Analysis</h3>
+                    <p>Our validated machine learning models analyze your inputs against thousands of patient records to determine statistical risk.</p>
+                </div>
+                <div class="step-card">
+                    <div class="icon-wrapper">
+                        <i data-lucide="bar-chart-3"></i>
+                    </div>
+                    <h3>3. Actionable Insights</h3>
+                    <p>Receive a clear probability score, risk stratification, and detailed breakdown of your primary contributing risk factors.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="bottom-cta">
+        <div class="cta-container">
+            <h2>Ready to understand your health risks?</h2>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-dashboard">
+                Go to Dashboard <i data-lucide="arrow-right" class="arrow-icon"></i>
+            </a>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <p class="footer-title">MedAI — Clinical Grade AI Screening</p>
+        <p class="footer-disclaimer">For informational purposes only. Not intended to replace professional medical advice.</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Screening History — MedAI</title>
+
+    <style>
+        /* ── Reset & Base Design Tokens ──────────────────────────────────────── */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --primary: hsl(187, 85%, 25%);
+            --primary-10: hsl(187, 85%, 95%);
+            --primary-20: hsl(187, 85%, 88%);
+            --navy: hsl(215, 25%, 27%);
+            --bg: hsl(210, 40%, 98%);
+            --card: #ffffff;
+            --border: hsl(214, 32%, 91%);
+            --text: hsl(222, 47%, 11%);
+            --muted: hsl(215, 16%, 47%);
+            --blue: hsl(210, 70%, 55%);
+            --blue-10: hsl(210, 70%, 93%);
+            --purple: hsl(258, 90%, 66%);
+            --purple-10: hsl(258, 90%, 95%);
+            --green: hsl(142, 76%, 36%);
+            --green-bg: #dcfce7;
+            --green-border: #bbf7d0;
+            --yellow: hsl(38, 92%, 50%);
+            --yellow-bg: #fef9c3;
+            --yellow-border: #fde68a;
+            --red: hsl(0, 84%, 60%);
+            --red-bg: #fee2e2;
+            --red-border: #fca5a5;
+            --radius: 14px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.04), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── Navbar Layout Matching MedAI Specifications ───────────────────────── */
+        nav {
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+            padding: 0 32px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 26px;
+            color: var(--primary);
+            text-decoration: none;
+            letter-spacing: -0.02em;
+        }
+
+        .nav-brand svg {
+            color: var(--primary);
+            width: 38px;
+            height: 38px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--muted);
+            transition: color .2s ease;
+        }
+
+        .nav-links a.active,
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        /* ── Structural Grid Layout ───────────────────────────────────────────── */
+        .page {
+            max-width: 1140px;
+            margin: 0 auto;
+            padding: 44px 24px 80px;
+        }
+
+        .page-top {
+            margin-bottom: 32px;
+        }
+
+        .page-top h1 {
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            color: #0f172a;
+        }
+
+        .page-top p {
+            font-size: 14px;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        /* ── Metric Summary Chips ─────────────────────────────────────────────── */
+        .stat-chips {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .chip {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px 20px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            background: var(--card);
+            box-shadow: var(--shadow);
+        }
+
+        .chip-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .chip-icon svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .chip-val {
+            font-weight: 700;
+            font-size: 22px;
+            color: #0f172a;
+            line-height: 1.2;
+        }
+
+        .chip-lbl {
+            color: var(--muted);
+            font-size: 12.5px;
+            font-weight: 500;
+            margin-top: 2px;
+        }
+
+        /* ── Control Console Panel ────────────────────────────────────────────── */
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #e2e8f0;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 5px;
+        }
+
+        .filter-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 13.5px;
+            font-weight: 600;
+            cursor: pointer;
+            background: transparent;
+            color: #475569;
+            transition: all .2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .filter-btn.active {
+            background: var(--card);
+            color: var(--text);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+        }
+
+        .filter-btn svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .search-wrap {
+            position: relative;
+            flex: 1;
+            max-width: 420px;
+            min-width: 260px;
+        }
+
+        .search-wrap svg {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            color: var(--muted);
+            pointer-events: none;
+        }
+
+        .search-wrap input {
+            width: 100%;
+            padding: 10px 16px 10px 40px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            color: var(--text);
+            background: var(--card);
+            outline: none;
+            transition: all .2s ease;
+            box-shadow: var(--shadow);
+        }
+
+        .search-wrap input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-10);
+        }
+
+        .sort-select {
+            padding: 10px 36px 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            color: var(--text);
+            background: var(--card);
+            outline: none;
+            appearance: none;
+            box-shadow: var(--shadow);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            cursor: pointer;
+        }
+
+        /* ── Main Log Cards ─────────────────────────────────────────────────── */
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 24px 28px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .record-count {
+            font-size: 13.5px;
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+        /* ── Dynamic Database Rows ──────────────────────────────────────────── */
+        #recordList {
+            list-style: none;
+        }
+
+        .record-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 28px;
+            border-bottom: 1px solid var(--border);
+            gap: 16px;
+            transition: background-color .15s ease;
+        }
+
+        .record-item:last-child {
+            border-bottom: none;
+        }
+
+        .record-item:hover {
+            background: #f8fafc;
+        }
+
+        .record-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .record-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .record-icon.heart {
+            background: var(--primary-10);
+            color: var(--primary);
+        }
+
+        .record-icon.diabetes {
+            background: var(--blue-10);
+            color: var(--blue);
+        }
+
+        .record-icon.parkinson {
+            background: var(--purple-10);
+            color: var(--purple);
+        }
+
+        .record-icon svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .record-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .record-meta {
+            font-size: 12.5px;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        .record-right {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+            flex-shrink: 0;
+        }
+
+        .prob-block {
+            text-align: right;
+            min-width: 80px;
+        }
+
+        .prob-val {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .prob-lbl {
+            font-size: 11px;
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+        .result-block {
+            text-align: center;
+            min-width: 70px;
+        }
+
+        .result-lbl {
+            font-size: 11px;
+            color: var(--muted);
+            font-weight: 500;
+            margin-top: 2px;
+        }
+
+        /* Risk Status Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 5px 14px;
+            border-radius: 999px;
+            font-size: 11.5px;
+            font-weight: 600;
+            border: 1px solid;
+            text-transform: capitalize;
+        }
+
+        .badge.low {
+            background: var(--green-bg);
+            color: #166534;
+            border-color: var(--green-border);
+        }
+
+        .badge.moderate {
+            background: var(--yellow-bg);
+            color: #854d0e;
+            border-color: var(--yellow-border);
+        }
+
+        .badge.high {
+            background: var(--red-bg);
+            color: #991b1b;
+            border-color: var(--red-border);
+        }
+
+        .pred-positive {
+            color: var(--red);
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .pred-negative {
+            color: var(--green);
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        /* ── Table Empty State UI ────────────────────────────────────────────── */
+        .empty-state {
+            padding: 80px 24px;
+            text-align: center;
+            display: none;
+        }
+
+        .empty-state svg {
+            width: 56px;
+            height: 46px;
+            color: var(--muted);
+            opacity: .4;
+            margin: 0 auto 20px;
+            display: block;
+        }
+
+        .empty-state p {
+            color: #334155;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .empty-state .sub {
+            font-size: 13.5px;
+            color: var(--muted);
+            margin-top: 6px;
+        }
+
+        /* ── Pagination Footer ────────────────────────────────────────────────── */
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 28px;
+            border-top: 1px solid var(--border);
+            background: #fafafa;
+        }
+
+        .page-info {
+            font-size: 13.5px;
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+        .page-btns {
+            display: flex;
+            gap: 6px;
+        }
+
+        .page-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--card);
+            font-size: 13.5px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all .15s ease;
+            color: #475569;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            border-color: var(--primary);
+            background: var(--primary-10);
+            color: var(--primary);
+        }
+
+        .page-btn.active {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+        }
+
+        .page-btn:disabled {
+            opacity: .35;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-wrap {
+                max-width: 100%;
+            }
+
+            .prob-block,
+            .result-block {
+                display: none;
+            }
+        }
+
+        .nav-links a.logout-link {
+            color: #ef4444;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 8px;
+            background: transparent;
+            transition: all 0.2s ease;
+        }
+
+        .nav-links a.logout-link:hover {
+            background: #fee2e2;
+            /* Soft red background box */
+            color: #991b1b;
+            /* Deep clinical red text color */
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav>
+        <a href="/" class="nav-brand">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M3 12h3l3-9 4 18 3-13 1 4h4" />
+            </svg>
+            <span>MedAI</span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/dashboard">Dashboard</a></li>
+            <li><a href="/heart">Heart AI</a></li>
+            <li><a href="/diabetes">Diabetes AI</a></li>
+            <li><a href="/parkinsons">Parkinson AI</a></li>
+            <li><a href="/history" class="active">History</a></li>
+            <li><a href="/logout" class="logout-link">Log Out</a></li>
+        </ul>
+    </nav>
+
+    <div class="page">
+
+        <div class="page-top">
+            <h1>Screening History</h1>
+            <p>Review comprehensive log historical metrics and clinical prediction registries</p>
+        </div>
+
+        <div class="stat-chips" id="statChips"></div>
+
+        <div class="controls">
+            <div class="filter-group">
+                <button class="filter-btn active" onclick="setFilter('all', this)">All</button>
+                <button class="filter-btn" onclick="setFilter('heart', this)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path
+                            d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                    </svg>
+                    Heart
+                </button>
+                <button class="filter-btn" onclick="setFilter('diabetes', this)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+                    </svg>
+                    Diabetes
+                </button>
+                <button class="filter-btn" onclick="setFilter('parkinson', this)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path
+                            d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1 0-4.12 2.5 2.5 0 0 1 0-4.88 2.5 2.5 0 0 1 0-4.12A2.5 2.5 0 0 1 9.5 2z" />
+                    </svg>
+                    Parkinson
+                </button>
+            </div>
+
+            <div class="search-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+                <input type="text" id="searchInput" placeholder="Search parameters via age, condition or risk state..."
+                    oninput="applyFilters()" />
+            </div>
+
+            <select class="sort-select" id="sortSelect" onchange="applyFilters()">
+                <option value="date-desc">Newest First</option>
+                <option value="date-asc">Oldest First</option>
+                <option value="prob-desc">Highest Risk First</option>
+                <option value="prob-asc">Lowest Risk First</option>
+            </select>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Prediction Records Storage Node</div>
+                <span class="record-count" id="recordCount">Processing records...</span>
+            </div>
+
+            <ul id="recordList"></ul>
+
+            <div class="empty-state" id="emptyState">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" />
+                </svg>
+                <p id="emptyTitle">Log registry queries empty</p>
+                <p class="sub">No records match the requested filtering criteria.</p>
+            </div>
+
+            <div class="pagination" id="pagination">
+                <span class="page-info" id="pageInfo"></span>
+                <div class="page-btns" id="pageBtns"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let allRecords = [];
+        let currentFilter = 'all';
+        let currentPage = 1;
+        const recordsPerPage = 6;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            loadHistoryData();
+        });
+
+        function loadHistoryData() {
+            fetch("/api/history-records")
+                .then(response => {
+                    if (!response.ok) throw new Error("History network response was not ok.");
+                    return response.json();
+                })
+                .then(data => {
+                    allRecords = data.screenings;
+                    renderStatChips();
+                    applyFilters();
+                })
+                .catch(err => {
+                    console.error(err);
+                    document.getElementById('recordCount').innerText = "Failed to load database logs.";
+                });
+        }
+
+        function renderStatChips() {
+            const total = allRecords.length;
+            const heart = allRecords.filter(r => r.type === 'heart').length;
+            const diab = allRecords.filter(r => r.type === 'diabetes').length;
+            const park = allRecords.filter(r => r.type === 'parkinson').length;
+
+            document.getElementById('statChips').innerHTML = `
+      <div class="chip"><div class="chip-icon" style="background:#f1f5f9;color:#64748b"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div><div class="chip-val">${total}</div><div class="chip-lbl">Total Logged</div></div></div>
+      <div class="chip"><div class="chip-icon" style="background:var(--primary-10);color:var(--primary)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div><div><div class="chip-val">${heart}</div><div class="chip-lbl">Cardio Records</div></div></div>
+      <div class="chip"><div class="chip-icon" style="background:var(--blue-10);color:var(--blue)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg></div><div><div class="chip-val">${diab}</div><div class="chip-lbl">Glycemic Records</div></div></div>
+      <div class="chip"><div class="chip-icon" style="background:var(--purple-10);color:var(--purple)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1 0-4.12 2.5 2.5 0 0 1 0-4.88 2.5 2.5 0 0 1 0-4.12A2.5 2.5 0 0 1 9.5 2z"/></svg></div><div><div class="chip-val">${park}</div><div class="chip-lbl">Neurology Records</div></div></div>
+    `;
+        }
+
+        function setFilter(type, btn) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentFilter = type;
+            currentPage = 1;
+            applyFilters();
+        }
+
+        function applyFilters() {
+            let filtered = [...allRecords];
+
+            // 1. Core Condition Categorization filter mapping 
+            if (currentFilter !== 'all') {
+                filtered = filtered.filter(r => r.type === currentFilter);
+            }
+
+            // 2. Query text pattern validation index lookup
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            if (query) {
+                filtered = filtered.filter(r =>
+                    r.name.toLowerCase().includes(query) ||
+                    r.risk.toLowerCase().includes(query) ||
+                    r.age.toString().includes(query)
+                );
+            }
+
+            // 3. Sorting sequence re-arrangement mapping
+            const sortVal = document.getElementById('sortSelect').value;
+            if (sortVal === 'date-asc') {
+                filtered.reverse(); // Default file storage array structure array is desc
+            } else if (sortVal === 'prob-desc') {
+                filtered.sort((a, b) => b.probability - a.probability);
+            } else if (sortVal === 'prob-asc') {
+                filtered.sort((a, b) => a.probability - b.probability);
+            }
+
+            document.getElementById('recordCount').innerText = `${filtered.length} records parsed matching filter criteria`;
+            paginateRecords(filtered);
+        }
+
+        function paginateRecords(records) {
+            const totalPages = Math.ceil(records.length / recordsPerPage) || 1;
+            if (currentPage > totalPages) currentPage = 1;
+
+            const start = (currentPage - 1) * recordsPerPage;
+            const end = start + recordsPerPage;
+            const pageSlice = records.slice(start, end);
+
+            const listElement = document.getElementById('recordList');
+            const emptyElement = document.getElementById('emptyState');
+            const pagElement = document.getElementById('pagination');
+
+            if (pageSlice.length === 0) {
+                listElement.innerHTML = '';
+                emptyElement.style.display = 'block';
+                pagElement.style.display = 'none';
+                return;
+            }
+
+            emptyElement.style.display = 'none';
+            pagElement.style.display = 'flex';
+
+            listElement.innerHTML = pageSlice.map(item => {
+                let iconSvg = '';
+                if (item.type === 'heart') {
+                    iconSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
+                } else if (item.type === 'diabetes') {
+                    iconSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>`;
+                } else if (item.type === 'parkinson') {
+                    iconSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1 0-4.12 2.5 2.5 0 0 1 0-4.88 2.5 2.5 0 0 1 0-4.12A2.5 2.5 0 0 1 9.5 2zM14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44 2.5 2.5 0 0 0 0-4.12 2.5 2.5 0 0 0 0-4.88 2.5 2.5 0 0 0 0-4.12A2.5 2.5 0 0 0 14.5 2z"/></svg>`;
+                }
+
+                const statusText = item.outcome === 1 ? '<span class="pred-positive">Positive</span>' : '<span class="pred-negative">Negative</span>';
+
+                return `
+        <li class="record-item">
+          <div class="record-left">
+            <div class="record-icon ${item.type}">${iconSvg}</div>
+            <div>
+              <div class="record-name">${item.name}</div>
+              <div class="record-meta">Age ${item.age} • Checked on ${item.date}</div>
+            </div>
+          </div>
+          <div class="record-right">
+            <div class="prob-block">
+              <div class="prob-val">${item.probability}%</div>
+              <div class="prob-lbl">probability</div>
+            </div>
+            <div class="result-block">
+              <div>${statusText}</div>
+              <div class="result-lbl">diagnostic</div>
+            </div>
+            <span class="badge ${item.risk}">${item.risk} risk</span>
+          </div>
+        </li>
+      `;
+            }).join('');
+
+            // Update Pagination summary controls updates buttons mapping 
+            document.getElementById('pageInfo').innerText = `Showing page ${currentPage} of ${totalPages}`;
+
+            let btnHtml = `<button class="page-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="changePage(${currentPage - 1}, ${totalPages})">&larr;</button>`;
+            for (let i = 1; i <= totalPages; i++) {
+                btnHtml += `<button class="page-btn ${currentPage === i ? 'active' : ''}" onclick="changePage(${i}, ${totalPages})">${i}</button>`;
+            }
+            btnHtml += `<button class="page-btn" ${currentPage === totalPages ? 'disabled' : ''} onclick="changePage(${currentPage + 1}, ${totalPages})">&rarr;</button>`;
+            document.getElementById('pageBtns').innerHTML = btnHtml;
+        }
+
+        function changePage(target, total) {
+            if (target < 1 || target > total) return;
+            currentPage = target;
+            applyFilters();
+        }
+    </script>
+
+</body>
+
+</html>

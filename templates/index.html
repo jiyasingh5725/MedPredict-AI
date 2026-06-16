@@ -1,113 +1,303 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MedAI — Predictive Health Intelligence</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MedAI — Clinical Grade AI Predictive Architecture</title>
+  <style>
+    /* ── Core Layout & Reset Tokens ──────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary:      hsl(187, 85%, 25%);
+      --primary-dark: hsl(187, 85%, 15%);
+      --primary-10:   hsl(187, 85%, 95%);
+      --bg:           hsl(210, 40%, 98%);
+      --card:         #ffffff;
+      --border:       hsl(214, 32%, 91%);
+      --text:         hsl(222, 47%, 11%);
+      --muted:        hsl(215, 16%, 47%);
+      --blue:         #3b82f6;
+      --purple:       #8b5cf6;
+      --radius:       16px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Header Navbar ────────────────────────────────────────────────────── */
+    header {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0; z-index: 100;
+      height: 75px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 24px;
+      color: var(--primary);
+      text-decoration: none;
+      letter-spacing: -0.02em;
+    }
+    .brand svg { width: 32px; height: 32px; }
+
+    .nav-actions { display: flex; gap: 16px; }
+
+    .btn-text {
+      background: transparent; border: none;
+      color: var(--text); font-size: 15px; font-weight: 600;
+      cursor: pointer; padding: 10px 20px; transition: color .2s;
+    }
+    .btn-text:hover { color: var(--primary); }
+
+    .btn-nav-primary {
+      background: var(--primary); color: white; border: none;
+      padding: 10px 24px; border-radius: 30px; font-size: 15px;
+      font-weight: 600; cursor: pointer; transition: background .2s;
+    }
+    .btn-nav-primary:hover { background: var(--primary-dark); }
+
+    /* ── Hero Webpage Front Banner ────────────────────────────────────────── */
+    .hero {
+      max-width: 1200px; margin: 0 auto;
+      padding: 100px 24px 80px;
+      text-align: center;
+    }
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--primary-10); color: var(--primary);
+      padding: 6px 16px; border-radius: 99px;
+      font-size: 13px; font-weight: 700; margin-bottom: 24px;
+    }
+
+    .hero h1 {
+      font-size: 56px; font-weight: 800; letter-spacing: -0.03em;
+      line-height: 1.15; color: #0f172a; max-width: 850px; margin: 0 auto 24px;
+    }
+
+    .hero p {
+      font-size: 18px; color: var(--muted); max-width: 620px;
+      margin: 0 auto 36px; line-height: 1.6;
+    }
+
+    .hero-btns { display: flex; gap: 16px; justify-content: center; }
+
+    .btn-lg-primary {
+      background: var(--primary); color: white; border: none;
+      padding: 16px 36px; border-radius: 12px; font-size: 16px;
+      font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(0,102,113,0.15);
+      transition: all .2s;
+    }
+    .btn-lg-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+
+    /* ── Feature Cards Grid ───────────────────────────────────────────────── */
+    .features {
+      max-width: 1200px; margin: 0 auto; padding: 40px 24px 120px;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;
+    }
+
+    .f-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 32px;
+      transition: all .25s ease;
+    }
+    .f-card:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(0,0,0,0.03); }
+
+    .f-icon { width: 48px; height: 44px; margin-bottom: 20px; }
+    .f-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; color: #0f172a; }
+    .f-card p { font-size: 14.5px; color: var(--muted); line-height: 1.6; }
+
+    /* ── Auth Modal Overlay Drawer ────────────────────────────────────────── */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1000; opacity: 0; pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .modal-overlay.active { opacity: 1; pointer-events: auto; }
+
+    .modal-box {
+      background: var(--card); padding: 40px; border-radius: var(--radius);
+      width: 100%; max-width: 420px; box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      position: relative; transform: scale(0.95); transition: transform 0.3s ease;
+    }
+    .modal-overlay.active .modal-box { transform: scale(1); }
+
+    .close-modal {
+      position: absolute; top: 20px; right: 20px;
+      background: #f1f5f9; border: none; width: 32px; height: 32px;
+      border-radius: 50%; cursor: pointer; font-size: 16px;
+      display: flex; align-items: center; justify-content: center; color: var(--muted);
+    }
+
+    .auth-form { display: none; }
+    .auth-form.active { display: block; }
+
+    .modal-box h2 { font-size: 26px; font-weight: 700; color: var(--primary); margin-bottom: 6px; }
+    .modal-box .sub { font-size: 13.5px; color: var(--muted); margin-bottom: 24px; }
+
+    .field { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+    .field label { font-size: 13px; font-weight: 600; color: #334155; }
+    .field input { padding: 12px 16px; border: 1px solid var(--border); border-radius: 8px; font-size: 15px; outline: none; }
+    .field input:focus { border-color: var(--blue); }
+
+    .btn-auth {
+      background: var(--primary); color: white; border: none; padding: 14px;
+      border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer;
+      width: 100%; margin-top: 8px; transition: background .2s;
+    }
+    .btn-auth:hover { background: var(--primary-dark); }
+
+    .switch-prompt { text-align: center; margin-top: 20px; font-size: 14px; color: var(--muted); }
+    .switch-prompt span { color: var(--blue); font-weight: 600; cursor: pointer; }
+    
+    .error-banner { color: #ef4444; background: #fee2e2; padding: 12px; border-radius: 6px; font-size: 14px; margin-bottom: 16px; display: none; }
+  </style>
 </head>
 <body>
 
-    <header class="navbar">
-        <div class="nav-container">
-            <div class="logo">
-                <i data-lucide="activity" class="logo-icon"></i>
-                <span>MedAI</span>
-            </div>
-            <nav class="nav-links">
-                <a href="{{ url_for('home') }}" class="active">Home</a>
-                <a href="{{ url_for('dashboard') }}">Dashboard</a>
-                <a href="{{ url_for('heart') }}">Heart AI</a>
-                <a href="{{ url_for('diabetes') }}">Diabetes AI</a>
-                <a href="{{ url_for('parkinsons') }}">Parkinson AI</a>
-                <a href="#">History</a>
-            </nav>
-        </div>
-    </header>
+  <header>
+    <a href="#" class="brand">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 12h3l3-9 4 18 3-13 1 4h4"/>
+      </svg>
+      <span>MedAI</span>
+    </a>
+    <div class="nav-actions">
+      <button class="btn-text" onclick="openAuth('login')">Sign In</button>
+      <button class="btn-nav-primary" onclick="openAuth('signup')">Get Started</button>
+    </div>
+  </header>
 
-    <section class="hero-section">
-        <div class="hero-container">
-            <div class="hero-content">
-                <div class="badge">
-                    <i data-lucide="activity" class="badge-icon"></i>
-                    <span>Clinical-grade screening</span>
-                </div>
-                <h1 class="hero-title">Predictive Health<br>Intelligence.</h1>
-                <p class="hero-description">
-                    MedAI uses advanced machine learning models to analyze key biomarkers and predict the risk of heart disease, diabetes, and neurological disorders with high clinical accuracy.
-                </p>
-                <div class="hero-cta-group">
-                    <a href="{{ url_for('heart') }}" class="btn btn-primary">
-                        <i data-lucide="heart" class="btn-icon"></i> Heart Screening
-                    </a>
-                    <a href="{{ url_for('diabetes') }}" class="btn btn-secondary">
-                        <i data-lucide="droplet" class="btn-icon"></i> Diabetes Screening
-                    </a>
-                    <a href="{{ url_for('parkinsons') }}" class="btn btn-primary-light">
-                        <i data-lucide="brain" class="btn-icon"></i> Parkinson Screening
-                    </a>
-                </div>
-            </div>
-            <div class="hero-visual">
-                <div class="visualization-wrapper">
-                    <img src="https://www.clicdata.com/wp-content/uploads/2025/05/predictive-analytics-healthcare.jpg" alt="Medical AI Visualization" class="hero-img">
-                    <div class="image-overlay-badge">
-                        <i data-lucide="shield-check"></i> ML Model Analysis Active
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+  <section class="hero">
+    <div class="hero-badge">
+      <span style="display:inline-block; width:6px; height:6px; background:var(--green); border-radius:50%"></span>
+      Clinical Grade Machine Learning Framework
+    </div>
+    <h1>Predictive Intelligence for Disease Screening</h1>
+    <p>Empowering diagnostic analysis workflows with specialized, high-accuracy RandomForest tree estimators across metabolic and neurological biomarkers.</p>
+    <div class="hero-blocks">
+      <button class="btn-lg-primary" onclick="openAuth('signup')">Access Core Dashboard Layout</button>
+    </div>
+  </section>
 
-    <section class="how-it-works">
-        <div class="section-container">
-            <h2 class="section-title">How MedAI Works</h2>
-            <p class="section-subtitle">Our diagnostic models are trained on extensive clinical datasets to identify subtle physiological patterns and risk factors before symptoms emerge.</p>
-            
-            <div class="steps-grid">
-                <div class="step-card">
-                    <div class="icon-wrapper">
-                        <i data-lucide="database"></i>
-                    </div>
-                    <h3>1. Input Biomarkers</h3>
-                    <p>Enter your latest lab results and physiological measurements. The platform accepts standard clinical data points.</p>
-                </div>
-                <div class="step-card highlight-card">
-                    <div class="icon-wrapper highlight-icon">
-                        <i data-lucide="cpu"></i>
-                    </div>
-                    <h3>2. ML Analysis</h3>
-                    <p>Our validated machine learning models analyze your inputs against thousands of patient records to determine statistical risk.</p>
-                </div>
-                <div class="step-card">
-                    <div class="icon-wrapper">
-                        <i data-lucide="bar-chart-3"></i>
-                    </div>
-                    <h3>3. Actionable Insights</h3>
-                    <p>Receive a clear probability score, risk stratification, and detailed breakdown of your primary contributing risk factors.</p>
-                </div>
-            </div>
-        </div>
-    </section>
+  <section class="features">
+    <div class="f-card">
+      <svg class="f-icon" style="color:var(--primary)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      <h3>Cardiovascular Risk AI</h3>
+      <p>Maps 13 structural vital and laboratory metrics to pinpoint anomalies and arterial block classification trends.</p>
+    </div>
+    <div class="f-card">
+      <svg class="f-icon" style="color:var(--blue)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+      <h3>Glycemic Index Tracking</h3>
+      <p>Evaluates 8 core metabolic insulin dependencies and plasma density variables to establish pre-diabetic risk flags.</p>
+    </div>
+    <div class="f-card">
+      <svg class="f-icon" style="color:var(--purple)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1 0-4.12 2.5 2.5 0 0 1 0-4.88 2.5 2.5 0 0 1 0-4.12A2.5 2.5 0 0 1 9.5 2z"/></svg>
+      <h3>Neurological Voice Analysis</h3>
+      <p>Processes multidimensional phonatory acoustic tremor entropy to detect early-onset indicators of Parkinson's Disease.</p>
+    </div>
+  </section>
 
-    <section class="bottom-cta">
-        <div class="cta-container">
-            <h2>Ready to understand your health risks?</h2>
-            <a href="{{ url_for('dashboard') }}" class="btn btn-dashboard">
-                Go to Dashboard <i data-lucide="arrow-right" class="arrow-icon"></i>
-            </a>
-        </div>
-    </section>
+  <div class="modal-overlay" id="authModal" onclick="closeAuth(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <button class="close-modal" onclick="toggleModal(false)">&times;</button>
+      
+      <div id="errorBanner" class="error-banner"></div>
 
-    <footer class="footer">
-        <p class="footer-title">MedAI — Clinical Grade AI Screening</p>
-        <p class="footer-disclaimer">For informational purposes only. Not intended to replace professional medical advice.</p>
-    </footer>
+      <div class="auth-form" id="loginForm">
+        <h2>Welcome Back</h2>
+        <p class="sub">Sign in to coordinate dynamic screenings</p>
+        <form onsubmit="handleAuthSubmit(event, '/api/auth/login')">
+          <div class="field"><label>Email Address</label><input type="email" name="email" required placeholder="name@domain.com"></div>
+          <div class="field"><label>Password</label><input type="password" name="password" required placeholder="••••••••"></div>
+          <button type="submit" class="btn-auth">Sign In</button>
+        </form>
+        <div class="switch-prompt">Don't have an account? <span onclick="switchForm('signup')">Sign up</span></div>
+      </div>
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+      <div class="auth-form" id="signupForm">
+        <h2>Create Workspace</h2>
+        <p class="sub">Register your secure profile credential</p>
+        <form onsubmit="handleAuthSubmit(event, '/api/auth/signup')">
+          <div class="field"><label>Full Name</label><input type="text" name="username" required placeholder="e.g. Jiya Singh"></div>
+          <div class="field"><label>Email Address</label><input type="email" name="email" required placeholder="name@domain.com"></div>
+          <div class="field"><label>Password</label><input type="password" name="password" required placeholder="Minimum 6 characters"></div>
+          <button type="submit" class="btn-auth">Register Profile</button>
+        </form>
+        <div class="switch-prompt">Already a member? <span onclick="switchForm('login')">Sign in</span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const modal = document.getElementById('authModal');
+    const errBanner = document.getElementById('errorBanner');
+
+    function toggleModal(open) {
+      modal.classList.toggle('active', open);
+      if(!open) errBanner.style.display = 'none';
+    }
+
+    function openAuth(mode) {
+      switchForm(mode);
+      toggleModal(true);
+    }
+
+    function closeAuth(e) {
+      if(e.target === modal) toggleModal(false);
+    }
+
+    function switchForm(mode) {
+      errBanner.style.display = 'none';
+      document.getElementById('loginForm').classList.toggle('active', mode === 'login');
+      document.getElementById('signupForm').classList.toggle('active', mode === 'signup');
+    }
+
+    function handleAuthSubmit(e, endpoint) {
+      e.preventDefault();
+      errBanner.style.display = 'none';
+      
+      const formData = new FormData(e.target);
+      const payload = Object.fromEntries(formData.entries());
+
+      fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      .then(async res => {
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Authentication structural mismatch encountered.");
+        return data;
+      })
+      .then(res => {
+        // SUCCESSFUL AUTHENTICATION REDIRECT MATRIX
+        window.location.href = "/dashboard";
+      })
+      .catch(err => {
+        errBanner.innerText = err.message;
+        errBanner.style.display = 'block';
+      });
+    }
+  </script>
 </body>
 </html>
