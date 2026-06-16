@@ -1,6 +1,71 @@
 {
     "screenings": [
         {
+            "id": 18,
+            "user_id": 1,
+            "type": "parkinson",
+            "name": "Parkinson Neurological Screening",
+            "age": 50,
+            "date": "Jun 16, 2026",
+            "probability": 100,
+            "risk": "high",
+            "outcome": 1
+        },
+        {
+            "id": 17,
+            "user_id": 1,
+            "type": "parkinson",
+            "name": "Parkinson Neurological Screening",
+            "age": 50,
+            "date": "Jun 16, 2026",
+            "probability": 100,
+            "risk": "high",
+            "outcome": 1
+        },
+        {
+            "id": 16,
+            "user_id": 1,
+            "type": "diabetes",
+            "name": "Diabetes Disease Screening",
+            "age": 39,
+            "date": "Jun 16, 2026",
+            "probability": 41,
+            "risk": "moderate",
+            "outcome": 0
+        },
+        {
+            "id": 15,
+            "user_id": 1,
+            "type": "heart",
+            "name": "Heart Disease Screening",
+            "age": 54,
+            "date": "Jun 16, 2026",
+            "probability": 77,
+            "risk": "high",
+            "outcome": 1
+        },
+        {
+            "id": 14,
+            "user_id": 1,
+            "type": "heart",
+            "name": "Heart Disease Screening",
+            "age": 54,
+            "date": "Jun 16, 2026",
+            "probability": 77,
+            "risk": "high",
+            "outcome": 1
+        },
+        {
+            "id": 13,
+            "type": "parkinson",
+            "name": "Parkinson Neurological Screening",
+            "age": 50,
+            "date": "Jun 16, 2026",
+            "probability": 100,
+            "risk": "high",
+            "outcome": 1
+        },
+        {
             "id": 12,
             "type": "diabetes",
             "name": "Diabetes Disease Screening",
@@ -119,6 +184,14 @@
             "probability": 12,
             "risk": "low",
             "outcome": 0
+        }
+    ],
+    "users": [
+        {
+            "id": 1,
+            "username": "JIYA SINGH",
+            "email": "jiyaprab@gmail.com",
+            "password": "pbkdf2:sha256:1000000$M4isEiyVCxKT4usk$4bfdedc6081e14a7de233c63f96008966427b2a8f7da90ff33726881032daf0e"
         }
     ]
 }

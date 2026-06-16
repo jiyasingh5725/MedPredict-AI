@@ -1,51 +1,66 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, redirect, url_for
 import pandas as pd
 import joblib
 import json
 import os
 from datetime import datetime
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 
 app = Flask(__name__)
+app.secret_key = "super-secret-medai-key-change-this-in-production"
 
 # ==========================================
-# PATHS & LIGHTWEIGHT STORAGE ENGINE (JSON)
+# FLASK-LOGIN SESSION MANAGER CONFIG
+# ==========================================
+login_manager = LoginManager()
+login_manager.login_view = "index"  # Kicks unauthenticated requests back to landing portal
+login_manager.init_app(app)
+
+class User(UserMixin):
+    def __init__(self, user_id, username, email):
+        self.id = user_id
+        self.username = username
+        self.email = email
+
+@login_manager.user_loader
+def load_user(user_id):
+    db = read_db()
+    for u in db.get("users", []):
+        if str(u["id"]) == str(user_id):
+            return User(u["id"], u["username"], u["email"])
+    return None
+
+# ==========================================
+# FILE SYSTEM JSON STORAGE INFRASTRUCTURE
 # ==========================================
 DB_PATH = os.path.join("DataFiles", "database.json")
 os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
 
 def init_db():
-    """Initializes the JSON database file with template history data if missing."""
     if not os.path.exists(DB_PATH):
         initial_structure = {
-            "screenings": [
-                { "id": 1, "type": "parkinson", "name": "Parkinson Neurological Screening", "age": 68, "date": "Jun 14, 2026", "probability": 74, "risk": "high", "outcome": 1 },
-                { "id": 2, "type": "heart", "name": "Heart Disease Screening", "age": 54, "date": "Jun 12, 2026", "probability": 18, "risk": "low", "outcome": 0 },
-                { "id": 3, "type": "diabetes", "name": "Diabetes Disease Screening", "age": 33, "date": "Jun 12, 2026", "probability": 51, "risk": "moderate", "outcome": 1 },
-                { "id": 4, "type": "heart", "name": "Heart Disease Screening", "age": 63, "date": "Jun 12, 2026", "probability": 82, "risk": "high", "outcome": 1 },
-                { "id": 5, "type": "parkinson", "name": "Parkinson Neurological Screening", "age": 47, "date": "Jun 10, 2026", "probability": 12, "risk": "low", "outcome": 0 }
-            ]
+            "users": [],
+            "screenings": []
         }
         with open(DB_PATH, "w") as f:
             json.dump(initial_structure, f, indent=4)
 
 def read_db():
-    """Reads screening records from the persistent store file node."""
     init_db()
     with open(DB_PATH, "r") as f:
         return json.load(f)
 
 def write_db(data):
-    """Writes updated history matrix logs back to the disk database."""
     with open(DB_PATH, "w") as f:
         json.dump(data, f, indent=4)
 
 def append_screening(screening_type, display_name, age, probability, risk_level, outcome):
-    """Saves a prediction record to the top of the history list array."""
     db = read_db()
     new_id = max([s["id"] for s in db["screenings"]], default=0) + 1
-    
     new_record = {
         "id": new_id,
+        "user_id": current_user.id if current_user.is_authenticated else None,
         "type": screening_type,
         "name": display_name,
         "age": int(age),
@@ -54,9 +69,8 @@ def append_screening(screening_type, display_name, age, probability, risk_level,
         "risk": risk_level,
         "outcome": int(outcome)
     }
-    db["screenings"].insert(0, new_record)  # Prepend so newest appears first
+    db["screenings"].insert(0, new_record)
     write_db(db)
-
 
 # ==========================================
 # LOAD PIPELINE BINARIES
@@ -65,113 +79,170 @@ heart_model = joblib.load("ML_Models/heart_disease_risk_pipeline.joblib")
 diabetes_model = joblib.load("ML_Models/diabetes_pipeline.joblib")
 parkinsons_model = joblib.load("ML_Models/parkinsons_pipeline.joblib")
 
-
 # ==========================================
-# PAGE ROUTING LINKS
+# PUBLIC LANDING WEBPAGE VIEW ROUTE
 # ==========================================
 @app.route("/")
+def index():
+    if current_user.is_authenticated:
+        return redirect(url_for("home"))
+    return render_template("index.html")
+
+# ==========================================
+# SECURED ASYNC AUTHENTICATION API ENDPOINTS
+# ==========================================
+@app.route("/api/auth/login", methods=["POST"])
+def api_login():
+    try:
+        req = request.get_json()
+        email = req.get("email", "").strip().lower()
+        password = req.get("password", "")
+        
+        db = read_db()
+        users_list = db.get("users", [])
+        
+        for u in users_list:
+            if u["email"] == email:
+                if check_password_hash(u["password"], password):
+                    user_obj = User(u["id"], u["username"], u["email"])
+                    login_user(user_obj)
+                    return jsonify({"success": True})
+                
+        return jsonify({"error": "Invalid email reference or password verification combination."}), 401
+    except Exception as e:
+        return jsonify({"error": f"Server processing breakdown: {str(e)}"}), 500
+
+@app.route("/api/auth/signup", methods=["POST"])
+def api_signup():
+    try:
+        req = request.get_json()
+        username = req.get("username", "").strip()
+        email = req.get("email", "").strip().lower()
+        password = req.get("password", "")
+
+        if len(password) < 6:
+            return jsonify({"error": "Password matrix complexity key length must be 6 or higher."}), 400
+
+        db = read_db()
+        if "users" not in db:
+            db["users"] = []
+
+        for u in db["users"]:
+            if u["email"] == email:
+                return jsonify({"error": "This email address is already logged as an active workspace token user."}), 400
+
+        new_id = max([u["id"] for u in db["users"]], default=0) + 1
+        hashed_pwd = generate_password_hash(password, method="pbkdf2:sha256")
+        
+        new_user = {"id": new_id, "username": username, "email": email, "password": hashed_pwd}
+        db["users"].append(new_user)
+        write_db(db)
+
+        user_obj = User(new_id, username, email)
+        login_user(user_obj)
+        return jsonify({"success": True})
+    except Exception as e:
+        return jsonify({"error": f"Registration pipeline crashed: {str(e)}"}), 500
+
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for("index"))
+
+# ==========================================
+# SECURED APP LINKS WORKSPACE ROUTING PAGES
+# ==========================================
+@app.route("/home")
+@login_required
 def home():
     return render_template("home.html")
 
 @app.route("/dashboard")
+@login_required
 def dashboard():
     return render_template("dashboard.html")
 
 @app.route("/history")
+@login_required
 def history():
     return render_template("history.html")
 
-@app.route("/logout")
-def logout():
-    return render_template("index.html")
-
 @app.route("/heart")
+@login_required
 def heart():
     return render_template("heart.html")
 
 @app.route("/diabetes")
+@login_required
 def diabetes():
     return render_template("diabetes.html")
 
 @app.route("/parkinsons")
+@login_required
 def parkinsons():
     return render_template("parkinsons.html")
 
-
 # ==========================================
-# LIVE DATA INTERFACE API ENDPOINTS
+# DATA METRICS INTERFACE SERVICE ENDPOINTS
 # ==========================================
 @app.route("/api/dashboard-metrics")
+@login_required
 def get_dashboard_metrics():
-    """Computes dynamic analytics summaries for your chart.js dashboard layouts."""
     db = read_db()
-    screenings = db["screenings"]
+    screenings = [s for s in db["screenings"] if s.get("user_id") == current_user.id]
     
     total = len(screenings)
     hearts = [s for s in screenings if s["type"] == "heart"]
     diabs = [s for s in screenings if s["type"] == "diabetes"]
     parks = [s for s in screenings if s["type"] == "parkinson"]
-    
     high_risk = len([s for s in screenings if s["risk"] == "high"])
     
-    # Calculate live positive diagnosis percent thresholds safely
     h_rate = round((len([s for s in hearts if s["outcome"] == 1]) / len(hearts)) * 100) if hearts else 0
     d_rate = round((len([s for s in diabs if s["outcome"] == 1]) / len(diabs)) * 100) if diabs else 0
     p_rate = round((len([s for s in parks if s["outcome"] == 1]) / len(parks)) * 100) if parks else 0
 
-    # Extract distinct chronological dates for trend monitoring timelines (Limit to last 10 entries)
     raw_dates = sorted(list(set([s["date"] for s in screenings])))
     active_dates = raw_dates[-10:] if len(raw_dates) > 10 else raw_dates
     
-    chart_labels = []
-    heart_trend, diab_trend, park_trend = [], [], []
-    
+    chart_labels, heart_trend, diab_trend, park_trend = [], [], [], []
     for d in active_dates:
         try:
             dt_obj = datetime.strptime(d, "%b %d, %Y")
             chart_labels.append(dt_obj.strftime("%m-%d"))
         except:
             chart_labels.append(d)
-            
         heart_trend.append(len([s for s in hearts if s["date"] == d]))
         diab_trend.append(len([s for s in diabs if s["date"] == d]))
         park_trend.append(len([s for s in parks if s["date"] == d]))
 
     return jsonify({
         "metrics": {
-            "totalScreenings": total,
-            "heartCount": len(hearts),
-            "heartPositiveRate": h_rate,
-            "diabetesCount": len(diabs),
-            "diabetesPositiveRate": d_rate,
-            "parkinsonCount": len(parks),
-            "parkinsonPositiveRate": p_rate,
-            "highRiskCases": high_risk
+            "totalScreenings": total, "heartCount": len(hearts), "heartPositiveRate": h_rate,
+            "diabetesCount": len(diabs), "diabetesPositiveRate": d_rate,
+            "parkinsonCount": len(parks), "parkinsonPositiveRate": p_rate, "highRiskCases": high_risk
         },
-        "trendChart": {
-            "labels": chart_labels,
-            "heartData": heart_trend,
-            "diabetesData": diab_trend,
-            "parkinsonData": park_trend
-        },
+        "trendChart": {"labels": chart_labels, "heartData": heart_trend, "diabetesData": diab_trend, "parkinsonData": park_trend},
         "riskDistribution": {
             "low": len([s for s in screenings if s["risk"] == "low"]),
             "moderate": len([s for s in screenings if s["risk"] == "moderate"]),
             "high": high_risk
         },
-        "recentScreenings": screenings[:5]  # Serve latest 5 logs
+        "recentScreenings": screenings[:5]
     })
 
 @app.route("/api/history-records")
+@login_required
 def get_history_records():
-    """Provides full history entries list array directly to table processors."""
-    return jsonify(read_db())
-
+    db = read_db()
+    user_screenings = [s for s in db["screenings"] if s.get("user_id") == current_user.id]
+    return jsonify({"screenings": user_screenings})
 
 # ==========================================
-# HEART CLINICAL MODEL PREDICTOR ENDPOINT
+# MODEL PIPELINE PREDICTOR PORTS
 # ==========================================
 @app.route("/predict-heart", methods=["POST"])
+@login_required
 def predict_heart():
     try:
         input_data = request.get_json()
@@ -187,10 +258,8 @@ def predict_heart():
         target_outcome = 1 if probability >= 0.5 else 0
         risk_level = "low" if probability < 0.30 else ("moderate" if probability < 0.70 else "high")
         
-        # Save prediction dynamically to JSON file database
         append_screening("heart", "Heart Disease Screening", data["age"], probability, risk_level, target_outcome)
 
-        # Compute user relative variance deviations against standard reference points
         feature_means = {"age": 54.37, "sex": 0.68, "cp": 0.97, "trestbps": 131.62, "chol": 246.26, "fbs": 0.15, "restecg": 0.53, "thalach": 149.65, "exang": 0.33, "oldpeak": 1.04, "slope": 1.40, "ca": 0.73, "thal": 2.31}
         feature_stds = {"age": 9.08, "sex": 0.47, "cp": 1.03, "trestbps": 17.54, "chol": 51.83, "fbs": 0.36, "restecg": 0.53, "thalach": 22.91, "exang": 0.47, "oldpeak": 1.16, "slope": 0.62, "ca": 1.02, "thal": 0.61}
         labels = {"age": "Patient Age", "sex": "Sex", "cp": "Chest Pain Classification Type", "trestbps": "Resting Blood Pressure", "chol": "Serum Cholesterol Level", "fbs": "Fasting Blood Sugar threshold", "restecg": "Resting ECG Metrics", "thalach": "Maximum Heart Rate Achieved", "exang": "Exercise Induced Angina Findings", "oldpeak": "ST Depression (oldpeak)", "slope": "ST Segment Slope Profile", "ca": "Number of Major Colored Vessels", "thal": "Thalassemia Genetic Diagnostic Status"}
@@ -234,10 +303,8 @@ def predict_heart():
         return jsonify({"error": str(e)}), 400
 
 
-# ==========================================
-# DIABETES CLINICAL PREDICTOR ENDPOINT
-# ==========================================
 @app.route("/predict-diabetes", methods=["POST"])
+@login_required
 def predict_diabetes():
     try:
         input_data = request.get_json()
@@ -252,7 +319,6 @@ def predict_diabetes():
         target_outcome = 1 if probability >= 0.5 else 0
         risk_level = "low" if probability < 0.30 else ("moderate" if probability < 0.70 else "high")
         
-        # Save prediction dynamically to JSON file database
         append_screening("diabetes", "Diabetes Disease Screening", data["Age"], probability, risk_level, target_outcome)
 
         feature_means = {"Pregnancies": 3.84, "Glucose": 120.89, "BloodPressure": 69.10, "SkinThickness": 20.53, "Insulin": 79.79, "BMI": 31.99, "DiabetesPedigreeFunction": 0.471, "Age": 33.24}
@@ -293,15 +359,13 @@ def predict_diabetes():
         return jsonify({"error": str(e)}), 400
 
 
-# ==========================================
-# PARKINSON ACOUSTIC MODEL PREDICTOR ENDPOINT
-# ==========================================
 @app.route("/predict-parkinsons", methods=["POST"])
+@login_required
 def predict_parkinsons():
     try:
         input_data = request.get_json()
 
-        # Build data dictionary using original CSV schema mapping indices headers
+        # Explicitly formatted column layout keys matching CSV datasets transformer schema indices
         data = {
             "MDVP:Fo(Hz)": float(input_data["MDVP_Fo_Hz"]), "MDVP:Fhi(Hz)": float(input_data["MDVP_Fhi_Hz"]), "MDVP:Flo(Hz)": float(input_data["MDVP_Flo_Hz"]),
             "MDVP:Jitter(%)": float(input_data["MDVP_Jitter_Percent"]), "MDVP:Jitter(Abs)": float(input_data["MDVP_Jitter_Abs"]), "MDVP:RAP": float(input_data["MDVP_RAP"]),
@@ -317,7 +381,6 @@ def predict_parkinsons():
         status_outcome = 1 if probability >= 0.5 else 0
         risk_level = "low" if probability < 0.35 else ("moderate" if probability < 0.65 else "high")
         
-        # Save prediction dynamically to JSON file database (Approximate patient profile age context to 50)
         append_screening("parkinson", "Parkinson Neurological Screening", 50, probability, risk_level, status_outcome)
 
         feature_means = {"MDVP:Fo(Hz)": 154.228, "MDVP:Fhi(Hz)": 197.104, "MDVP:Flo(Hz)": 116.324, "MDVP:Jitter(%)": 0.0062, "MDVP:Jitter(Abs)": 0.000044, "MDVP:RAP": 0.0033, "MDVP:PPQ": 0.0034, "Jitter:DDP": 0.0099, "MDVP:Shimmer": 0.0297, "MDVP:Shimmer(dB)": 0.282, "Shimmer:APQ3": 0.0156, "Shimmer:APQ5": 0.0178, "MDVP:APQ": 0.0240, "Shimmer:DDA": 0.0469, "NHR": 0.0248, "HNR": 21.885, "RPDE": 0.498, "DFA": 0.718, "spread1": -5.684, "spread2": 0.226, "D2": 2.381, "PPE": 0.206}
@@ -354,24 +417,15 @@ def predict_parkinsons():
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
-
-# ==========================================
-# RE-START FLASK APPLICATION
-# ==========================================
-if __name__ == "__main__":
-    app.run(debug=True)
-    
 # ==========================================
 # FORCE CACHE CLEARING FOR NAVIGATION
 # ==========================================
 @app.after_request
 def add_header(response):
-    """
-    Instructs the browser to completely bypass local cache memory.
-    This guarantees fresh dynamic data loads during navbar tab swapping.
-    """
     response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
     response.headers["Pragma"] = "no-cache"
     response.headers["Expires"] = "0"
-    return response    
-    
+    return response
+
+if __name__ == "__main__":
+    app.run(debug=True)
